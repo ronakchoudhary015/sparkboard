@@ -1,4 +1,4 @@
-const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/YOUR_LINK_HERE/exec";
+const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxuaSsIjgh4apEw5dmSuOHwKfhALDZOXK14ZVmLyKgVZ53WP6DxszxqbCO5-CcYQbfD/exec";
 
 document.getElementById("emailForm").addEventListener("submit", async function (e) {
   e.preventDefault();
