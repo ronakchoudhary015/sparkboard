@@ -1,26 +1,1386 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>Sparkboard</title>
-  <link rel="stylesheet" href="style.css">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sparkboard — One Page. Your Entire Company. Always in Sync.</title>
+<meta name="description" content="Replace your 6-tool morning chaos with one living company page + AI Co-Founder. Join 3,200+ teams on the waitlist.">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400;1,700&family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;1,300&family=DM+Mono:wght@400;500&family=Epilogue:ital,wght@0,300;0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
+<style>
+
+/* ══════════════════════════════════════
+   GLOBAL RESET + VARIABLES
+══════════════════════════════════════ */
+*, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+html { scroll-behavior:smooth; font-size:16px; }
+
+:root {
+  /* MAIN PAGE PALETTE */
+  --ink:#0d0c0a; --ink2:rgba(13,12,10,0.55); --ink3:rgba(13,12,10,0.28);
+  --cream:#f5f0e8; --warm:#ede7db; --warm2:#e4dcd0;
+  --fire:#d94f1e; --fire2:#f07040;
+  --gold:#c8952a; --gold2:#e8b84b; --green:#1a6b3c;
+  --surface:#ffffff; --border:rgba(13,12,10,0.1); --border2:rgba(13,12,10,0.18);
+  --r-sm:8px; --r-md:14px; --r-lg:22px; --r-xl:32px;
+  /* AI PAGE PALETTE */
+  --ai-bg:#080810; --ai-surface:#0f0f1a; --ai-surface2:#161624;
+  --ai-border:rgba(255,255,255,0.07); --ai-border2:rgba(255,255,255,0.13);
+  --ai-text:#f0ece8; --ai-text2:rgba(240,236,232,0.55); --ai-text3:rgba(240,236,232,0.28);
+  --orange:#ff6b35; --orange2:#ff8c5a;
+  --ai-gold:#f0b429; --ai-green:#00d084; --ai-blue:#4d9fff;
+  --ai-red:#ff4d6d; --purple:#a855f7;
+}
+
+body {
+  font-family:'DM Sans',sans-serif;
+  overflow-x:hidden; -webkit-font-smoothing:antialiased;
+}
+
+/* ══════════════════════════════════════
+   PAGE SYSTEM — show/hide pages
+══════════════════════════════════════ */
+.page { display:none; }
+.page.active { display:block; }
+
+/* PAGE TRANSITIONS */
+.page { animation:pageIn 0.35s ease both; }
+@keyframes pageIn { from{opacity:0;transform:translateY(10px)} to{opacity:1;transform:translateY(0)} }
+
+/* ══════════════════════════════════════
+   SHARED GRAIN OVERLAY
+══════════════════════════════════════ */
+#grain {
+  position:fixed; inset:0; pointer-events:none; z-index:9999; opacity:0.3;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+}
+
+/* ══════════════════════════════════════
+   SHARED NAV BASE
+══════════════════════════════════════ */
+nav {
+  position:fixed; top:0; width:100%; z-index:200;
+  padding:18px 6%;
+  display:flex; justify-content:space-between; align-items:center;
+  backdrop-filter:blur(24px);
+}
+
+/* MAIN PAGE NAV */
+#mainNav {
+  background:rgba(245,240,232,0.88);
+  border-bottom:1px solid var(--border);
+}
+.logo-main {
+  font-family:'Playfair Display',serif;
+  font-size:1.45rem; font-weight:700;
+  letter-spacing:-0.02em; color:var(--ink);
+  cursor:pointer; text-decoration:none;
+}
+.logo-main em { font-style:italic; color:var(--fire); }
+.nav-right-main { display:flex; gap:10px; align-items:center; }
+.nav-tag {
+  display:flex; align-items:center; gap:7px;
+  background:rgba(217,79,30,0.1); border:1px solid rgba(217,79,30,0.25);
+  color:var(--fire); padding:6px 16px; border-radius:100px;
+  font-size:0.75rem; font-weight:700; letter-spacing:0.06em; text-transform:uppercase;
+}
+.nav-dot { width:6px; height:6px; border-radius:50%; background:var(--fire); animation:pulse 2s infinite; }
+.nav-ai-link {
+  display:flex; align-items:center; gap:7px;
+  background:rgba(217,79,30,0.08); border:1px solid rgba(217,79,30,0.2);
+  color:var(--fire); padding:9px 18px; border-radius:100px;
+  font-size:0.82rem; font-weight:600; cursor:pointer;
+  transition:all 0.2s; border:none; font-family:'DM Sans',sans-serif;
+}
+.nav-ai-link:hover { background:rgba(217,79,30,0.15); }
+.nav-cta-btn {
+  background:var(--ink); color:var(--cream);
+  padding:10px 24px; border-radius:100px;
+  font-size:0.85rem; font-weight:600;
+  cursor:pointer; border:none; transition:all 0.22s;
+  font-family:'DM Sans',sans-serif;
+}
+.nav-cta-btn:hover { background:var(--fire); transform:translateY(-1px); }
+
+/* AI PAGE NAV */
+#aiNav {
+  background:rgba(8,8,16,0.88);
+  border-bottom:1px solid var(--ai-border);
+}
+.logo-ai {
+  font-family:'Syne',sans-serif; font-weight:800;
+  font-size:1.3rem; letter-spacing:-0.02em;
+  color:var(--ai-text); cursor:pointer;
+}
+.logo-ai em { font-style:normal; color:var(--orange); }
+.nav-ai-badge {
+  display:flex; align-items:center; gap:8px;
+  font-size:0.72rem; font-weight:700; text-transform:uppercase;
+  letter-spacing:0.1em; color:var(--orange);
+}
+.ai-pulse { width:8px; height:8px; border-radius:50%; background:var(--orange); position:relative; }
+.ai-pulse::after { content:''; position:absolute; inset:-3px; border-radius:50%; border:1px solid var(--orange); animation:ripple 1.5s infinite; }
+.nav-back-btn {
+  background:rgba(255,255,255,0.06); border:1px solid var(--ai-border2);
+  color:var(--ai-text2); padding:9px 20px; border-radius:100px;
+  font-size:0.82rem; font-weight:600; cursor:pointer;
+  transition:all 0.2s; font-family:'DM Sans',sans-serif;
+}
+.nav-back-btn:hover { color:var(--ai-text); border-color:rgba(255,255,255,0.25); }
+
+/* SHARED ANIMATIONS */
+@keyframes pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:0.4;transform:scale(0.65)} }
+@keyframes ripple { 0%{transform:scale(1);opacity:0.8} 100%{transform:scale(2.5);opacity:0} }
+@keyframes fadeUp { from{opacity:0;transform:translateY(22px)} to{opacity:1;transform:translateY(0)} }
+@keyframes scroll { to{transform:translateX(-50%)} }
+@keyframes bounce { 0%,60%,100%{transform:translateY(0)} 30%{transform:translateY(-6px)} }
+@keyframes pulse2 { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:0.4;transform:scale(0.7)} }
+@keyframes scrollDown { 0%{transform:scaleY(0);transform-origin:top} 50%{transform:scaleY(1);transform-origin:top} 51%{transform:scaleY(1);transform-origin:bottom} 100%{transform:scaleY(0);transform-origin:bottom} }
+
+/* REVEAL */
+.reveal { opacity:0; transform:translateY(18px); transition:opacity 0.6s ease,transform 0.6s ease; }
+.reveal.in { opacity:1; transform:translateY(0); }
+
+/* TOAST */
+#toast {
+  position:fixed; bottom:28px; left:50%;
+  transform:translateX(-50%) translateY(80px);
+  padding:12px 24px; border-radius:100px;
+  font-size:0.87rem; font-weight:600;
+  z-index:700; transition:transform 0.4s cubic-bezier(0.34,1.56,0.64,1);
+  white-space:nowrap; pointer-events:none;
+}
+#toast.show { transform:translateX(-50%) translateY(0); }
+#toast.main-toast { background:var(--ink); color:var(--cream); border:1px solid rgba(255,255,255,0.1); }
+#toast.ai-toast { background:var(--ai-surface2); color:var(--ai-text); border:1px solid var(--ai-border2); }
+
+/* ══════════════════════════════════════
+   ██ MAIN PAGE STYLES
+══════════════════════════════════════ */
+#mainPage { background:var(--cream); color:var(--ink); }
+
+/* NOISE */
+#mainPage::before { content:''; position:fixed; inset:0; pointer-events:none; z-index:100; opacity:0.28; background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='256' height='256'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='256' height='256' filter='url(%23n)' opacity='0.045'/%3E%3C/svg%3E"); }
+
+/* HERO */
+.m-hero { min-height:100vh; padding:130px 6% 80px; display:flex; flex-direction:column; justify-content:center; align-items:center; text-align:center; position:relative; overflow:hidden; }
+.m-hero-bg { position:absolute; inset:0; pointer-events:none; background:radial-gradient(ellipse 75% 55% at 50% -10%,rgba(217,79,30,0.1) 0%,transparent 65%),radial-gradient(ellipse 45% 35% at 85% 85%,rgba(200,149,42,0.07) 0%,transparent 55%),radial-gradient(ellipse 35% 30% at 5% 75%,rgba(26,107,60,0.05) 0%,transparent 55%); }
+.countdown-banner { display:inline-flex; align-items:center; gap:20px; background:var(--ink); color:var(--cream); padding:12px 28px; border-radius:100px; margin-bottom:36px; animation:fadeUp 0.5s ease both; position:relative; z-index:2; }
+.cb-label { font-size:0.72rem; text-transform:uppercase; letter-spacing:0.12em; font-weight:600; color:rgba(245,240,232,0.5); }
+.cb-timer { display:flex; align-items:center; gap:8px; }
+.cb-unit { text-align:center; }
+.cb-num { font-family:'DM Mono',monospace; font-size:1.2rem; font-weight:500; color:var(--cream); line-height:1; min-width:28px; }
+.cb-lbl { font-size:0.6rem; text-transform:uppercase; letter-spacing:0.1em; color:rgba(245,240,232,0.4); margin-top:2px; }
+.cb-colon { font-size:1.1rem; color:rgba(245,240,232,0.3); font-family:'DM Mono',monospace; margin-top:-4px; }
+.m-hero h1 { font-family:'Playfair Display',serif; font-size:clamp(3rem,7.5vw,7.5rem); font-weight:900; line-height:0.95; letter-spacing:-0.04em; max-width:1000px; margin-bottom:24px; animation:fadeUp 0.5s 0.1s ease both; position:relative; z-index:2; }
+.m-hero h1 em { font-style:italic; color:var(--fire); }
+.m-hero h1 .strike { position:relative; color:var(--ink2); display:inline-block; }
+.m-hero h1 .strike::after { content:''; position:absolute; left:0; right:0; top:55%; height:4px; background:var(--fire); transform:rotate(-2deg); }
+.m-hero-sub { font-size:clamp(1rem,1.8vw,1.25rem); color:var(--ink2); max-width:580px; line-height:1.7; margin-bottom:48px; font-weight:300; animation:fadeUp 0.5s 0.2s ease both; position:relative; z-index:2; }
+.wf-row { display:flex; gap:10px; max-width:520px; width:100%; animation:fadeUp 0.5s 0.3s ease both; position:relative; z-index:2; margin-bottom:20px; }
+.wf-input { flex:1; background:var(--surface); border:1.5px solid var(--border2); border-radius:100px; padding:16px 24px; font-size:0.95rem; font-family:'DM Sans',sans-serif; color:var(--ink); outline:none; transition:all 0.2s; }
+.wf-input:focus { border-color:var(--fire); box-shadow:0 0 0 3px rgba(217,79,30,0.1); }
+.wf-input::placeholder { color:var(--ink3); }
+.wf-btn { background:var(--fire); color:white; border:none; padding:16px 28px; border-radius:100px; font-size:0.92rem; font-weight:600; cursor:pointer; font-family:'DM Sans',sans-serif; white-space:nowrap; transition:all 0.22s; }
+.wf-btn:hover { background:var(--fire2); transform:translateY(-1px); box-shadow:0 8px 24px rgba(217,79,30,0.3); }
+.m-social-proof { display:flex; align-items:center; gap:14px; animation:fadeUp 0.5s 0.4s ease both; position:relative; z-index:2; }
+.avs { display:flex; }
+.av-sm { width:32px; height:32px; border-radius:50%; border:2px solid var(--cream); margin-left:-10px; display:flex; align-items:center; justify-content:center; font-size:0.75rem; font-weight:700; color:white; font-family:'Playfair Display',serif; }
+.av-sm:first-child { margin-left:0; }
+.av1{background:linear-gradient(135deg,#667eea,#764ba2)} .av2{background:linear-gradient(135deg,#f093fb,#f5576c)} .av3{background:linear-gradient(135deg,#4facfe,#00f2fe)} .av4{background:linear-gradient(135deg,#43e97b,#38f9d7)} .av5{background:linear-gradient(135deg,#fa709a,#fee140)}
+.proof-txt { font-size:0.82rem; color:var(--ink2); }
+.proof-txt strong { color:var(--ink); font-weight:600; }
+.m-stats { display:flex; gap:48px; margin-top:64px; animation:fadeUp 0.5s 0.45s ease both; position:relative; z-index:2; }
+.ms { text-align:center; }
+.ms-num { font-family:'Playfair Display',serif; font-size:2.2rem; font-weight:900; color:var(--ink); line-height:1; letter-spacing:-0.03em; }
+.ms-lbl { font-size:0.72rem; color:var(--ink3); text-transform:uppercase; letter-spacing:0.1em; margin-top:4px; }
+.scroll-hint { position:absolute; bottom:32px; left:50%; transform:translateX(-50%); display:flex; flex-direction:column; align-items:center; gap:6px; animation:fadeUp 0.5s 0.6s ease both; z-index:2; }
+.scroll-line { width:1px; height:40px; background:linear-gradient(to bottom,var(--ink2),transparent); animation:scrollDown 2s ease infinite; }
+.scroll-lbl { font-size:0.65rem; text-transform:uppercase; letter-spacing:0.16em; color:var(--ink3); font-weight:600; }
+
+/* MARQUEE */
+.marquee-section { background:var(--ink); overflow:hidden; padding:14px 0; border-top:1px solid rgba(255,255,255,0.06); border-bottom:1px solid rgba(255,255,255,0.06); }
+.marquee-track { display:flex; gap:40px; width:max-content; animation:scroll 28s linear infinite; }
+.marquee-item { display:flex; align-items:center; gap:10px; white-space:nowrap; color:rgba(245,240,232,0.3); font-size:0.78rem; font-weight:500; text-transform:uppercase; letter-spacing:0.1em; }
+.marquee-sep { color:var(--fire); font-size:0.9rem; }
+
+/* SECTION HELPERS */
+.m-section { padding:100px 6%; max-width:1200px; margin:0 auto; }
+.m-eyebrow { font-size:0.7rem; text-transform:uppercase; letter-spacing:0.16em; color:var(--fire); font-weight:700; margin-bottom:14px; text-align:center; }
+.m-title { font-family:'Playfair Display',serif; font-size:clamp(2rem,4.5vw,3.8rem); font-weight:900; letter-spacing:-0.035em; line-height:1.0; text-align:center; margin-bottom:60px; }
+.m-title em { font-style:italic; color:var(--fire); }
+
+/* AI SPOTLIGHT CARD — on main page */
+.ai-spotlight {
+  background:var(--ink); border-radius:var(--r-xl);
+  padding:64px; position:relative; overflow:hidden;
+  margin:0 6% 100px;
+  border:1px solid rgba(255,107,53,0.15);
+}
+.ai-spotlight::before { content:''; position:absolute; inset:0; background:radial-gradient(ellipse 80% 60% at 50% 0%,rgba(255,107,53,0.12) 0%,transparent 65%); pointer-events:none; }
+.ai-spotlight-grid { display:grid; grid-template-columns:1fr 1fr; gap:56px; align-items:center; position:relative; z-index:2; }
+.ai-sp-left {}
+.ai-sp-tag { display:inline-flex; align-items:center; gap:8px; background:rgba(255,107,53,0.12); border:1px solid rgba(255,107,53,0.25); color:var(--orange); padding:7px 18px; border-radius:100px; font-size:0.72rem; font-weight:700; text-transform:uppercase; letter-spacing:0.08em; margin-bottom:20px; }
+.ai-sp-title { font-family:'Playfair Display',serif; font-size:clamp(1.8rem,3vw,2.8rem); font-weight:900; color:var(--cream); letter-spacing:-0.03em; line-height:1.1; margin-bottom:16px; }
+.ai-sp-title em { font-style:italic; color:var(--orange); }
+.ai-sp-desc { font-size:0.95rem; color:rgba(245,240,232,0.5); line-height:1.75; margin-bottom:28px; }
+.ai-sp-btn { background:var(--orange); color:white; border:none; padding:15px 32px; border-radius:100px; font-size:0.95rem; font-weight:700; cursor:pointer; font-family:'DM Sans',sans-serif; transition:all 0.22s; display:inline-flex; align-items:center; gap:8px; }
+.ai-sp-btn:hover { background:var(--orange2); transform:translateY(-2px); box-shadow:0 12px 32px rgba(255,107,53,0.3); }
+.ai-sp-right {}
+.ai-sp-chat { background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.08); border-radius:16px; overflow:hidden; }
+.ai-sp-chat-head { padding:14px 18px; border-bottom:1px solid rgba(255,255,255,0.06); display:flex; align-items:center; gap:10px; }
+.ai-sp-av { width:32px; height:32px; border-radius:50%; background:linear-gradient(135deg,var(--orange),var(--ai-gold)); display:flex; align-items:center; justify-content:center; font-size:0.9rem; flex-shrink:0; }
+.ai-sp-name { font-size:0.85rem; font-weight:700; color:var(--cream); }
+.ai-sp-online { font-size:0.68rem; color:var(--ai-green); display:flex; align-items:center; gap:4px; }
+.ai-sp-chat-body { padding:16px; display:flex; flex-direction:column; gap:12px; }
+.ai-sp-msg { display:flex; gap:8px; align-items:flex-start; }
+.ai-sp-msg.user { flex-direction:row-reverse; }
+.ai-sp-msg-av { width:24px; height:24px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:0.7rem; flex-shrink:0; background:linear-gradient(135deg,var(--orange),var(--ai-gold)); }
+.ai-sp-msg-av.u { background:linear-gradient(135deg,#667eea,#764ba2); }
+.ai-sp-bubble { background:rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.08); border-radius:12px 12px 12px 3px; padding:10px 14px; font-size:0.82rem; color:rgba(245,240,232,0.8); line-height:1.55; max-width:85%; }
+.ai-sp-bubble.user { background:var(--orange); border-color:var(--orange); border-radius:12px 12px 3px 12px; color:white; }
+.ai-sp-bubble strong { color:var(--cream); }
+.ai-sp-footer { padding:12px 18px; border-top:1px solid rgba(255,255,255,0.06); text-align:center; font-size:0.72rem; color:rgba(245,240,232,0.25); }
+.ai-sp-caps { display:flex; flex-wrap:wrap; gap:8px; margin-top:24px; }
+.ai-sp-cap { display:flex; align-items:center; gap:6px; background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.08); padding:7px 14px; border-radius:100px; font-size:0.78rem; color:rgba(245,240,232,0.55); font-weight:500; }
+.ai-sp-cap-dot { width:5px; height:5px; border-radius:50%; }
+
+/* PROBLEM/SOLUTION SPLIT */
+.split-section { display:grid; grid-template-columns:1fr 1fr; gap:2px; background:var(--border); border:1px solid var(--border); border-radius:var(--r-xl); overflow:hidden; }
+.split-side { background:var(--cream); padding:56px 48px; }
+.split-side.dark { background:var(--ink); }
+.split-label { font-size:0.68rem; text-transform:uppercase; letter-spacing:0.16em; font-weight:700; margin-bottom:24px; display:flex; align-items:center; gap:8px; }
+.sl-bad { color:#c0392b; } .sl-good { color:#1a6b3c; }
+.split-title { font-family:'Playfair Display',serif; font-size:clamp(1.6rem,3vw,2.4rem); font-weight:700; letter-spacing:-0.025em; line-height:1.15; margin-bottom:32px; color:var(--ink); }
+.split-side.dark .split-title { color:var(--cream); }
+.problem-list,.solution-list { display:flex; flex-direction:column; gap:14px; }
+.problem-item { display:flex; gap:12px; align-items:flex-start; padding:14px 16px; background:rgba(192,57,43,0.06); border:1px solid rgba(192,57,43,0.12); border-radius:var(--r-sm); font-size:0.9rem; color:var(--ink2); line-height:1.5; }
+.pi-x { color:#c0392b; flex-shrink:0; font-weight:700; margin-top:2px; }
+.solution-item { display:flex; gap:12px; align-items:flex-start; padding:14px 16px; background:rgba(26,107,60,0.08); border:1px solid rgba(26,107,60,0.15); border-radius:var(--r-sm); font-size:0.9rem; color:rgba(245,240,232,0.75); line-height:1.5; }
+.si-check { color:#2ecc71; flex-shrink:0; font-weight:700; margin-top:2px; }
+
+/* HOW IT WORKS STEPS */
+.steps-flow { display:flex; gap:0; align-items:stretch; max-width:1100px; margin:0 auto; }
+.step-block { flex:1; padding:40px 32px; background:var(--surface); border:1px solid var(--border); position:relative; transition:all 0.28s; }
+.step-block:first-child { border-radius:var(--r-lg) 0 0 var(--r-lg); }
+.step-block:last-child { border-radius:0 var(--r-lg) var(--r-lg) 0; }
+.step-block:not(:first-child) { border-left:none; }
+.step-block:hover { background:var(--warm); transform:translateY(-4px); box-shadow:0 16px 48px rgba(0,0,0,0.1); z-index:1; }
+.step-arrow { position:absolute; right:-20px; top:50%; transform:translateY(-50%); width:40px; height:40px; background:var(--fire); border-radius:50%; display:flex; align-items:center; justify-content:center; color:white; font-size:1rem; font-weight:bold; z-index:2; box-shadow:0 4px 12px rgba(217,79,30,0.3); }
+.step-num { font-family:'Playfair Display',serif; font-size:3.5rem; font-weight:900; color:rgba(217,79,30,0.1); line-height:1; margin-bottom:12px; }
+.step-icon { font-size:2rem; margin-bottom:14px; display:block; }
+.step-title { font-weight:700; font-size:1.05rem; margin-bottom:10px; letter-spacing:-0.01em; }
+.step-desc { font-size:0.86rem; color:var(--ink2); line-height:1.65; }
+.step-time { display:inline-block; margin-top:12px; background:rgba(217,79,30,0.08); color:var(--fire); padding:4px 10px; border-radius:100px; font-size:0.72rem; font-weight:700; letter-spacing:0.04em; }
+
+/* FEATURES */
+.features-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:16px; }
+.feat-card { background:var(--surface); border:1px solid var(--border); border-radius:var(--r-lg); padding:32px 28px; transition:all 0.25s; position:relative; overflow:hidden; }
+.feat-card::before { content:''; position:absolute; top:0; left:0; right:0; height:2px; background:linear-gradient(90deg,transparent,var(--fire),transparent); opacity:0; transition:opacity 0.3s; }
+.feat-card:hover { border-color:rgba(217,79,30,0.2); transform:translateY(-4px); box-shadow:0 16px 48px rgba(0,0,0,0.08); }
+.feat-card:hover::before { opacity:1; }
+.feat-card.wide { grid-column:1/-1; display:flex; gap:40px; align-items:center; }
+.feat-icon { font-size:2rem; margin-bottom:16px; display:block; }
+.feat-title { font-weight:700; font-size:1.05rem; letter-spacing:-0.01em; margin-bottom:10px; }
+.feat-desc { font-size:0.87rem; color:var(--ink2); line-height:1.65; }
+.feat-tag { display:inline-block; margin-top:14px; background:rgba(217,79,30,0.07); color:var(--fire); padding:4px 12px; border-radius:100px; font-size:0.7rem; font-weight:700; text-transform:uppercase; letter-spacing:0.06em; }
+.feat-wide-content { flex:1; }
+.feat-wide-visual { flex:1; background:var(--warm); border-radius:var(--r-md); padding:24px; font-family:'DM Mono',monospace; font-size:0.8rem; line-height:1.8; color:var(--ink2); border:1px solid var(--border); }
+.fwv-line { display:flex; align-items:center; gap:10px; }
+.fwv-dot { width:7px; height:7px; border-radius:50%; flex-shrink:0; }
+.fwv-dot.green{background:#1a6b3c} .fwv-dot.fire{background:var(--fire)} .fwv-dot.gold{background:var(--gold)}
+
+/* INTEGRATIONS */
+.int-section { background:var(--ink); padding:80px 6%; text-align:center; overflow:hidden; }
+.int-title { font-family:'Playfair Display',serif; font-size:clamp(1.8rem,3.5vw,3rem); font-weight:900; color:var(--cream); letter-spacing:-0.03em; margin-bottom:12px; }
+.int-title em { font-style:italic; color:var(--fire2); }
+.int-sub { font-size:1rem; color:rgba(245,240,232,0.45); margin-bottom:48px; }
+.int-grid { display:flex; flex-wrap:wrap; gap:12px; justify-content:center; max-width:900px; margin:0 auto; }
+.int-chip { background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.1); border-radius:100px; padding:10px 22px; display:flex; align-items:center; gap:9px; font-size:0.88rem; font-weight:600; color:rgba(245,240,232,0.7); transition:all 0.2s; }
+.int-chip:hover { background:rgba(255,255,255,0.09); border-color:rgba(217,79,30,0.4); color:var(--cream); transform:translateY(-2px); }
+
+/* TESTIMONIALS */
+.testi-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:18px; }
+.testi-card { background:var(--surface); border:1px solid var(--border); border-radius:var(--r-lg); padding:28px; transition:transform 0.25s; }
+.testi-card:hover { transform:translateY(-3px); }
+.testi-quote { font-family:'Playfair Display',serif; font-size:2rem; color:var(--fire); line-height:1; margin-bottom:14px; }
+.testi-text { font-size:0.9rem; color:var(--ink2); line-height:1.72; margin-bottom:22px; font-style:italic; }
+.testi-auth { display:flex; align-items:center; gap:12px; }
+.ta-av { width:40px; height:40px; border-radius:50%; background:linear-gradient(135deg,var(--fire),var(--fire2)); display:flex; align-items:center; justify-content:center; font-family:'Playfair Display',serif; font-weight:700; color:white; font-size:1rem; flex-shrink:0; }
+.ta-name { font-weight:600; font-size:0.88rem; }
+.ta-role { font-size:0.76rem; color:var(--ink3); margin-top:2px; }
+.testi-stars { color:var(--gold); font-size:0.82rem; letter-spacing:2px; margin-bottom:12px; }
+
+/* PRICING */
+.m-pricing-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:16px; max-width:900px; margin:0 auto; }
+.m-price-card { background:var(--surface); border:1.5px solid var(--border); border-radius:var(--r-lg); padding:36px 28px; position:relative; transition:transform 0.25s; }
+.m-price-card:hover { transform:translateY(-4px); }
+.m-price-card.featured { border-color:var(--ink); background:var(--ink); color:var(--cream); }
+.hot-tag { position:absolute; top:-12px; left:50%; transform:translateX(-50%); background:var(--fire); color:white; font-size:0.65rem; font-weight:800; padding:4px 14px; border-radius:100px; text-transform:uppercase; letter-spacing:0.08em; white-space:nowrap; }
+.plan-tier { font-size:0.72rem; text-transform:uppercase; letter-spacing:0.12em; font-weight:700; color:var(--ink3); margin-bottom:14px; }
+.m-price-card.featured .plan-tier { color:rgba(245,240,232,0.4); }
+.plan-price-num { font-family:'Playfair Display',serif; font-size:3rem; font-weight:900; line-height:1; letter-spacing:-0.03em; margin-bottom:4px; }
+.plan-price-num sup { font-size:1.2rem; vertical-align:super; }
+.plan-note { font-size:0.8rem; color:var(--ink3); margin-bottom:28px; }
+.m-price-card.featured .plan-note { color:rgba(245,240,232,0.35); }
+.plan-feats { list-style:none; margin-bottom:28px; }
+.plan-feat { display:flex; gap:10px; align-items:flex-start; padding:9px 0; font-size:0.86rem; color:var(--ink2); border-bottom:1px solid var(--border); }
+.m-price-card.featured .plan-feat { color:rgba(245,240,232,0.65); border-color:rgba(255,255,255,0.07); }
+.plan-feat:last-child { border:none; }
+.feat-check { color:var(--green); flex-shrink:0; font-weight:700; }
+.feat-x { color:var(--ink3); flex-shrink:0; }
+.plan-btn { width:100%; padding:14px; border-radius:12px; font-size:0.95rem; font-weight:700; cursor:pointer; font-family:'DM Sans',sans-serif; transition:all 0.22s; border:none; }
+.plan-btn-outline { background:transparent; color:var(--ink); border:1.5px solid var(--border2); }
+.plan-btn-outline:hover { border-color:var(--ink); }
+.plan-btn-fill { background:var(--fire); color:white; }
+.plan-btn-fill:hover { background:var(--fire2); box-shadow:0 8px 28px rgba(217,79,30,0.28); }
+.plan-btn-white { background:var(--cream); color:var(--ink); }
+.plan-btn-white:hover { background:white; }
+
+/* FAQ */
+.faq-wrap { max-width:700px; margin:0 auto; }
+.faq-item { border-bottom:1px solid var(--border); }
+.faq-q { width:100%; background:none; border:none; color:var(--ink); text-align:left; padding:22px 0; font-size:0.96rem; font-weight:600; cursor:pointer; display:flex; justify-content:space-between; align-items:center; gap:16px; font-family:'DM Sans',sans-serif; transition:color 0.2s; }
+.faq-q:hover { color:var(--fire); }
+.faq-plus { color:var(--ink3); font-size:1.2rem; transition:transform 0.3s; flex-shrink:0; }
+.faq-item.open .faq-plus { transform:rotate(45deg); color:var(--fire); }
+.faq-a { max-height:0; overflow:hidden; transition:max-height 0.4s ease,padding 0.3s; font-size:0.88rem; color:var(--ink2); line-height:1.7; padding:0; }
+.faq-item.open .faq-a { max-height:300px; padding-bottom:20px; }
+
+/* MAIN WAITLIST SECTION */
+.m-waitlist-section { background:var(--ink); padding:100px 6%; text-align:center; position:relative; overflow:hidden; }
+.mwl-glow { position:absolute; inset:0; background:radial-gradient(ellipse 80% 60% at 50% 0%,rgba(217,79,30,0.18) 0%,transparent 65%); pointer-events:none; }
+.mwl-eyebrow { font-size:0.7rem; text-transform:uppercase; letter-spacing:0.16em; color:var(--fire2); font-weight:700; margin-bottom:20px; position:relative; z-index:2; display:flex; align-items:center; justify-content:center; gap:8px; }
+.mwl-dot { width:7px; height:7px; border-radius:50%; background:var(--fire2); animation:pulse 2s infinite; }
+.mwl-title { font-family:'Playfair Display',serif; font-size:clamp(2.5rem,5vw,4.5rem); font-weight:900; color:var(--cream); letter-spacing:-0.04em; line-height:1.0; margin-bottom:16px; position:relative; z-index:2; }
+.mwl-title em { font-style:italic; color:var(--fire2); }
+.mwl-sub { font-size:1.1rem; color:rgba(245,240,232,0.45); margin-bottom:48px; max-width:500px; margin-left:auto; margin-right:auto; line-height:1.7; position:relative; z-index:2; }
+.mwl-form { display:flex; gap:10px; max-width:520px; margin:0 auto 20px; position:relative; z-index:2; }
+.mwl-input { flex:1; background:rgba(245,240,232,0.07); border:1.5px solid rgba(245,240,232,0.15); border-radius:100px; padding:16px 24px; font-size:0.95rem; font-family:'DM Sans',sans-serif; color:var(--cream); outline:none; transition:all 0.2s; }
+.mwl-input:focus { border-color:var(--fire2); background:rgba(245,240,232,0.1); }
+.mwl-input::placeholder { color:rgba(245,240,232,0.3); }
+.mwl-btn { background:var(--fire); color:white; border:none; padding:16px 28px; border-radius:100px; font-size:0.92rem; font-weight:600; cursor:pointer; font-family:'DM Sans',sans-serif; white-space:nowrap; transition:all 0.22s; }
+.mwl-btn:hover { background:var(--fire2); transform:translateY(-1px); box-shadow:0 8px 28px rgba(217,79,30,0.35); }
+.mwl-guarantee { font-size:0.78rem; color:rgba(245,240,232,0.28); position:relative; z-index:2; margin-bottom:56px; }
+.mwl-perks { display:flex; gap:32px; justify-content:center; flex-wrap:wrap; position:relative; z-index:2; }
+.mwl-perk { display:flex; align-items:center; gap:10px; font-size:0.88rem; color:rgba(245,240,232,0.55); }
+.mwl-perk-icon { color:var(--fire2); }
+.mwl-success { display:none; background:rgba(26,107,60,0.08); border:1px solid rgba(26,107,60,0.2); border-radius:var(--r-lg); padding:28px; max-width:520px; margin:0 auto; position:relative; z-index:2; text-align:center; }
+.mwl-success.show { display:block; animation:fadeUp 0.4s ease; }
+
+/* COUNTER */
+.counter-section { background:var(--warm); padding:60px 6%; border-top:1px solid var(--border); border-bottom:1px solid var(--border); }
+.counter-inner { max-width:900px; margin:0 auto; display:flex; gap:0; text-align:center; }
+.counter-item { flex:1; padding:20px; border-right:1px solid var(--border); }
+.counter-item:last-child { border-right:none; }
+.ci-num { font-family:'Playfair Display',serif; font-size:3rem; font-weight:900; color:var(--ink); letter-spacing:-0.04em; line-height:1; }
+.ci-num span { color:var(--fire); }
+.ci-lbl { font-size:0.75rem; color:var(--ink3); text-transform:uppercase; letter-spacing:0.1em; margin-top:6px; }
+
+/* MAIN FOOTER */
+.m-footer { background:var(--ink); padding:48px 6%; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:20px; }
+.m-foot-logo { font-family:'Playfair Display',serif; font-size:1.3rem; font-weight:700; color:var(--cream); letter-spacing:-0.02em; }
+.m-foot-logo em { font-style:italic; color:var(--fire2); }
+.m-foot-links { display:flex; gap:28px; list-style:none; }
+.m-foot-links a { font-size:0.82rem; color:rgba(245,240,232,0.35); text-decoration:none; transition:color 0.2s; }
+.m-foot-links a:hover { color:rgba(245,240,232,0.7); }
+.m-foot-copy { font-size:0.78rem; color:rgba(245,240,232,0.25); }
+
+/* ══════════════════════════════════════
+   ██ AI PAGE STYLES
+══════════════════════════════════════ */
+#aiPage { background:var(--ai-bg); color:var(--ai-text); }
+#aiPage::before { content:''; position:fixed; inset:0; background-image:linear-gradient(rgba(255,107,53,0.04) 1px,transparent 1px),linear-gradient(90deg,rgba(255,107,53,0.04) 1px,transparent 1px); background-size:60px 60px; pointer-events:none; z-index:0; }
+
+/* AI HERO */
+.ai-hero { min-height:100vh; display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center; padding:120px 6% 80px; position:relative; z-index:2; overflow:hidden; }
+.ai-hero-glow { position:absolute; inset:0; pointer-events:none; background:radial-gradient(ellipse 60% 50% at 50% -10%,rgba(255,107,53,0.18) 0%,transparent 60%),radial-gradient(ellipse 40% 30% at 80% 80%,rgba(168,85,247,0.08) 0%,transparent 55%),radial-gradient(ellipse 30% 25% at 10% 60%,rgba(77,159,255,0.06) 0%,transparent 55%); }
+.ai-hero-tag { display:inline-flex; align-items:center; gap:10px; background:rgba(255,107,53,0.1); border:1px solid rgba(255,107,53,0.25); color:var(--orange); padding:8px 20px; border-radius:100px; font-size:0.75rem; font-weight:700; letter-spacing:0.08em; text-transform:uppercase; margin-bottom:28px; animation:fadeUp 0.5s ease both; }
+.ai-hero h1 { font-family:'Syne',sans-serif; font-size:clamp(3rem,8vw,7rem); font-weight:800; line-height:0.95; letter-spacing:-0.04em; margin-bottom:24px; animation:fadeUp 0.5s 0.1s ease both; }
+.ai-hero h1 .orange-txt { color:var(--orange); }
+.ai-hero h1 .dim-txt { color:var(--ai-text2); }
+.ai-hero-sub { font-size:clamp(1rem,1.8vw,1.2rem); color:var(--ai-text2); max-width:600px; line-height:1.75; margin-bottom:40px; animation:fadeUp 0.5s 0.2s ease both; font-weight:300; }
+.ai-hero-ctas { display:flex; gap:12px; flex-wrap:wrap; justify-content:center; animation:fadeUp 0.5s 0.3s ease both; margin-bottom:56px; }
+.ai-btn-primary { background:var(--orange); color:white; border:none; padding:15px 32px; border-radius:100px; font-size:0.95rem; font-weight:700; cursor:pointer; font-family:'DM Sans',sans-serif; transition:all 0.22s; }
+.ai-btn-primary:hover { background:var(--orange2); transform:translateY(-2px); box-shadow:0 12px 32px rgba(255,107,53,0.3); }
+.ai-btn-ghost { background:transparent; color:var(--ai-text); border:1px solid var(--ai-border2); padding:15px 32px; border-radius:100px; font-size:0.95rem; font-weight:600; cursor:pointer; font-family:'DM Sans',sans-serif; transition:all 0.22s; }
+.ai-btn-ghost:hover { border-color:rgba(255,255,255,0.3); background:rgba(255,255,255,0.04); }
+.caps-row { display:flex; gap:10px; flex-wrap:wrap; justify-content:center; max-width:700px; animation:fadeUp 0.5s 0.4s ease both; }
+.cap-pill { display:flex; align-items:center; gap:7px; background:rgba(255,255,255,0.04); border:1px solid var(--ai-border); padding:8px 16px; border-radius:100px; font-size:0.8rem; color:var(--ai-text2); font-weight:500; transition:all 0.2s; }
+.cap-pill:hover { border-color:rgba(255,107,53,0.3); color:var(--ai-text); }
+.cap-dot { width:6px; height:6px; border-radius:50%; }
+
+/* VS SECTION */
+.ai-section { padding:100px 6%; max-width:1100px; margin:0 auto; position:relative; z-index:2; }
+.ai-eyebrow { text-align:center; font-size:0.7rem; text-transform:uppercase; letter-spacing:0.14em; color:var(--orange); font-weight:700; margin-bottom:14px; }
+.ai-title { font-family:'Syne',sans-serif; font-size:clamp(2rem,4vw,3.2rem); font-weight:800; letter-spacing:-0.035em; line-height:1.05; text-align:center; margin-bottom:56px; }
+.ai-title em { font-style:italic; color:var(--orange); font-family:'Epilogue',sans-serif; }
+.vs-grid { display:grid; grid-template-columns:1fr auto 1fr; gap:24px; align-items:start; }
+.vs-card { background:var(--ai-surface); border:1px solid var(--ai-border); border-radius:20px; padding:32px 28px; }
+.vs-card.bad-ai { border-color:rgba(255,77,109,0.2); }
+.vs-card.good-ai { border-color:rgba(0,208,132,0.2); background:rgba(0,208,132,0.03); }
+.vs-label-ai { font-size:0.7rem; text-transform:uppercase; letter-spacing:0.12em; font-weight:700; margin-bottom:20px; display:flex; align-items:center; gap:8px; }
+.vs-label-ai.bad { color:var(--ai-red); } .vs-label-ai.good { color:var(--ai-green); }
+.vs-item-ai { display:flex; gap:11px; align-items:flex-start; padding:12px 0; font-size:0.88rem; color:var(--ai-text2); line-height:1.55; border-bottom:1px solid var(--ai-border); }
+.vs-item-ai:last-child { border:none; }
+.vs-ic { flex-shrink:0; margin-top:1px; font-weight:700; }
+.vs-ic.x { color:var(--ai-red); } .vs-ic.c { color:var(--ai-green); }
+.vs-divider-wrap { display:flex; align-items:center; justify-content:center; padding-top:80px; }
+.vs-vs { font-family:'Syne',sans-serif; font-size:1.2rem; font-weight:800; color:var(--ai-text3); letter-spacing:0.1em; }
+
+/* LIVE DEMO */
+.ai-demo-section { padding:0 6% 100px; max-width:1200px; margin:0 auto; position:relative; z-index:2; }
+.demo-shell { background:var(--ai-surface); border:1px solid var(--ai-border2); border-radius:28px; overflow:hidden; box-shadow:0 40px 100px rgba(0,0,0,0.5); position:relative; }
+.demo-shell::before { content:''; position:absolute; top:0; left:0; right:0; height:2px; background:linear-gradient(90deg,transparent,var(--orange),var(--ai-gold),transparent); }
+.demo-bar { background:var(--ai-surface2); padding:16px 24px; display:flex; align-items:center; gap:16px; border-bottom:1px solid var(--ai-border); }
+.demo-bar-dots { display:flex; gap:7px; }
+.d-dot { width:12px; height:12px; border-radius:50%; }
+.d-dot:nth-child(1){background:#ff5f57} .d-dot:nth-child(2){background:#ffbd2e} .d-dot:nth-child(3){background:#28ca41}
+.demo-bar-title { flex:1; text-align:center; font-size:0.82rem; font-weight:600; color:var(--ai-text3); font-family:'DM Mono',monospace; }
+.demo-live-badge { display:flex; align-items:center; gap:6px; font-size:0.72rem; font-weight:700; color:var(--ai-green); text-transform:uppercase; letter-spacing:0.08em; }
+.demo-live-dot { width:7px; height:7px; border-radius:50%; background:var(--ai-green); animation:pulse2 1.5s infinite; }
+.demo-layout { display:grid; grid-template-columns:280px 1fr; height:620px; }
+.demo-sidebar { border-right:1px solid var(--ai-border); display:flex; flex-direction:column; overflow:hidden; }
+.sb-head { padding:20px 18px; border-bottom:1px solid var(--ai-border); }
+.sb-ai-av { width:44px; height:44px; border-radius:14px; background:linear-gradient(135deg,var(--orange),var(--ai-gold)); display:flex; align-items:center; justify-content:center; font-size:1.3rem; margin-bottom:10px; }
+.sb-ai-name { font-family:'Syne',sans-serif; font-size:0.95rem; font-weight:800; margin-bottom:3px; color:var(--ai-text); }
+.sb-ai-status { font-size:0.72rem; color:var(--ai-green); display:flex; align-items:center; gap:5px; font-weight:600; }
+.sb-data { padding:14px 18px; border-bottom:1px solid var(--ai-border); }
+.sb-data-lbl { font-size:0.65rem; text-transform:uppercase; letter-spacing:0.1em; color:var(--ai-text3); font-weight:700; margin-bottom:10px; }
+.sb-data-row { display:flex; align-items:center; padding:7px 0; font-size:0.78rem; color:var(--ai-text2); border-bottom:1px solid rgba(255,255,255,0.04); }
+.sb-data-row:last-child { border:none; }
+.sb-data-val { margin-left:auto; font-family:'DM Mono',monospace; font-size:0.72rem; font-weight:500; }
+.sb-data-val.g { color:var(--ai-green); } .sb-data-val.w { color:var(--ai-gold); } .sb-data-val.r { color:var(--ai-red); }
+.sb-topics { flex:1; padding:14px 18px; overflow-y:auto; }
+.sb-topics-lbl { font-size:0.65rem; text-transform:uppercase; letter-spacing:0.1em; color:var(--ai-text3); font-weight:700; margin-bottom:10px; }
+.sb-topic { padding:9px 12px; border-radius:9px; font-size:0.8rem; color:var(--ai-text3); cursor:pointer; transition:all 0.2s; margin-bottom:4px; border:1px solid transparent; }
+.sb-topic:hover { background:rgba(255,107,53,0.08); color:var(--ai-text2); border-color:rgba(255,107,53,0.15); }
+.sb-topic.active { background:rgba(255,107,53,0.1); color:var(--orange); border-color:rgba(255,107,53,0.2); }
+.chat-area { display:flex; flex-direction:column; }
+.chat-msgs { flex:1; padding:24px; overflow-y:auto; display:flex; flex-direction:column; gap:16px; scroll-behavior:smooth; }
+.chat-msgs::-webkit-scrollbar { width:4px; }
+.chat-msgs::-webkit-scrollbar-thumb { background:rgba(255,255,255,0.1); border-radius:2px; }
+.ai-msg { display:flex; gap:12px; align-items:flex-start; }
+.ai-msg.user { flex-direction:row-reverse; }
+.ai-msg-av { width:32px; height:32px; border-radius:50%; background:linear-gradient(135deg,var(--orange),var(--ai-gold)); display:flex; align-items:center; justify-content:center; font-size:0.85rem; flex-shrink:0; }
+.ai-msg-av.u { background:linear-gradient(135deg,#667eea,#764ba2); }
+.ai-bubble { max-width:78%; background:var(--ai-surface2); border:1px solid var(--ai-border); border-radius:16px 16px 16px 4px; padding:13px 17px; font-size:0.88rem; line-height:1.65; color:var(--ai-text2); }
+.ai-msg.user .ai-bubble { background:var(--orange); border-color:var(--orange); border-radius:16px 16px 4px 16px; color:white; }
+.ai-bubble strong { color:var(--ai-text); font-weight:600; }
+.ai-msg.user .ai-bubble strong { color:white; }
+.ai-bubble .g-txt { color:var(--ai-green); font-weight:700; font-family:'DM Mono',monospace; }
+.ai-bubble .o-txt { color:var(--orange); font-weight:700; }
+.ai-bubble .w-txt { color:var(--ai-gold); font-weight:700; }
+.ai-bubble .r-txt { color:var(--ai-red); font-weight:700; }
+.ai-mini-metrics { display:grid; grid-template-columns:repeat(3,1fr); gap:8px; margin:10px 0; }
+.ai-mini-m { background:rgba(255,255,255,0.05); border:1px solid var(--ai-border2); border-radius:8px; padding:10px; text-align:center; }
+.ai-mini-m-val { font-family:'Syne',sans-serif; font-size:1.1rem; font-weight:800; }
+.ai-mini-m-val.g{color:var(--ai-green)} .ai-mini-m-val.o{color:var(--orange)} .ai-mini-m-val.w{color:var(--ai-gold)}
+.ai-mini-m-lbl { font-size:0.62rem; color:var(--ai-text3); margin-top:2px; text-transform:uppercase; letter-spacing:0.06em; }
+.ai-msg-time { font-size:0.65rem; color:var(--ai-text3); margin-top:5px; padding:0 4px; }
+.quick-row { padding:0 20px 12px; display:flex; gap:8px; flex-wrap:wrap; }
+.quick-btn { background:rgba(255,107,53,0.07); border:1px solid rgba(255,107,53,0.2); color:var(--orange); padding:7px 14px; border-radius:100px; font-size:0.75rem; font-weight:600; cursor:pointer; font-family:'DM Sans',sans-serif; transition:all 0.2s; white-space:nowrap; }
+.quick-btn:hover { background:rgba(255,107,53,0.15); transform:translateY(-1px); }
+.quick-btn:disabled { opacity:0.4; cursor:not-allowed; transform:none; }
+.chat-inp-wrap { padding:14px 20px 18px; border-top:1px solid var(--ai-border); }
+.chat-inp-row { display:flex; gap:10px; align-items:center; background:rgba(255,255,255,0.04); border:1px solid var(--ai-border2); border-radius:100px; padding:8px 8px 8px 20px; transition:border-color 0.2s; }
+.chat-inp-row:focus-within { border-color:rgba(255,107,53,0.4); }
+.chat-inp-field { flex:1; background:none; border:none; color:var(--ai-text); font-size:0.9rem; font-family:'DM Sans',sans-serif; outline:none; }
+.chat-inp-field::placeholder { color:var(--ai-text3); }
+.chat-send-btn { width:38px; height:38px; border-radius:50%; background:var(--orange); border:none; color:white; cursor:pointer; font-size:1rem; display:flex; align-items:center; justify-content:center; transition:all 0.2s; flex-shrink:0; }
+.chat-send-btn:hover { background:var(--orange2); transform:scale(1.05); }
+.chat-send-btn:disabled { opacity:0.4; cursor:not-allowed; transform:none; }
+.chat-hint-txt { text-align:center; font-size:0.68rem; color:var(--ai-text3); margin-top:8px; }
+.typing-bubble { display:flex; gap:12px; align-items:flex-start; }
+.typing-dots-wrap { display:flex; gap:4px; align-items:center; padding:14px 18px; background:var(--ai-surface2); border:1px solid var(--ai-border); border-radius:16px 16px 16px 4px; }
+.tdot { width:6px; height:6px; border-radius:50%; background:rgba(240,236,232,0.3); }
+.tdot:nth-child(1){animation:bounce 1.2s 0s infinite} .tdot:nth-child(2){animation:bounce 1.2s 0.15s infinite} .tdot:nth-child(3){animation:bounce 1.2s 0.3s infinite}
+
+/* AI CAPABILITIES */
+.ai-caps-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:18px; }
+.ai-cap-card { background:var(--ai-surface); border:1px solid var(--ai-border); border-radius:20px; padding:32px 28px; transition:all 0.28s; position:relative; overflow:hidden; }
+.ai-cap-card::after { content:''; position:absolute; top:0; left:0; right:0; height:1px; background:linear-gradient(90deg,transparent,var(--orange),transparent); opacity:0; transition:opacity 0.3s; }
+.ai-cap-card:hover { border-color:rgba(255,107,53,0.25); transform:translateY(-4px); box-shadow:0 20px 60px rgba(0,0,0,0.4); }
+.ai-cap-card:hover::after { opacity:1; }
+.ai-cap-icon { font-size:2.2rem; margin-bottom:16px; display:block; }
+.ai-cap-title { font-family:'Syne',sans-serif; font-size:1.05rem; font-weight:700; margin-bottom:10px; color:var(--ai-text); }
+.ai-cap-desc { font-size:0.86rem; color:var(--ai-text2); line-height:1.65; margin-bottom:16px; }
+.ai-cap-examples { display:flex; flex-direction:column; gap:6px; }
+.ai-cap-ex { font-size:0.78rem; color:var(--ai-text3); font-style:italic; padding:6px 10px; background:rgba(255,255,255,0.03); border-radius:6px; border-left:2px solid rgba(255,107,53,0.3); }
+
+/* EXAMPLES TABS */
+.ex-tabs { display:flex; gap:8px; margin-bottom:40px; flex-wrap:wrap; justify-content:center; }
+.ex-tab { padding:10px 22px; border-radius:100px; font-size:0.82rem; font-weight:600; cursor:pointer; border:1px solid var(--ai-border2); color:var(--ai-text3); background:transparent; font-family:'DM Sans',sans-serif; transition:all 0.2s; }
+.ex-tab:hover { color:var(--ai-text2); border-color:rgba(255,255,255,0.2); }
+.ex-tab.active { background:var(--orange); color:white; border-color:var(--orange); }
+.ex-panel { display:none; }
+.ex-panel.show { display:grid; grid-template-columns:1fr 1fr; gap:24px; }
+.ex-q-card { background:var(--ai-surface2); border:1px solid var(--ai-border2); border-radius:20px; padding:32px 28px; }
+.ex-q-lbl { font-size:0.68rem; text-transform:uppercase; letter-spacing:0.12em; color:var(--ai-text3); font-weight:700; margin-bottom:14px; display:flex; align-items:center; gap:8px; }
+.ex-q-text { font-family:'Syne',sans-serif; font-size:1.4rem; font-weight:700; color:var(--ai-text); letter-spacing:-0.02em; line-height:1.3; margin-bottom:20px; }
+.ex-context-box { background:rgba(255,255,255,0.04); border:1px solid var(--ai-border); border-radius:12px; padding:16px; font-size:0.8rem; color:var(--ai-text3); line-height:1.6; font-family:'DM Mono',monospace; }
+.ex-ctx-lbl { color:var(--orange); margin-bottom:8px; font-weight:700; font-size:0.72rem; }
+.ex-a-card { background:rgba(255,107,53,0.04); border:1px solid rgba(255,107,53,0.15); border-radius:20px; padding:32px 28px; }
+.ex-a-lbl { font-size:0.68rem; text-transform:uppercase; letter-spacing:0.12em; color:var(--orange); font-weight:700; margin-bottom:14px; display:flex; align-items:center; gap:8px; }
+.ex-a-text { font-size:0.9rem; color:var(--ai-text2); line-height:1.75; }
+.ex-a-text strong { color:var(--ai-text); font-weight:600; }
+.ex-a-text .g-t { color:var(--ai-green); font-weight:700; font-family:'DM Mono',monospace; }
+.ex-a-text .o-t { color:var(--orange); font-weight:700; }
+.ex-a-text .w-t { color:var(--ai-gold); font-weight:700; }
+.ex-a-text .r-t { color:var(--ai-red); font-weight:700; }
+.ex-a-text ul { padding-left:20px; margin:10px 0; }
+.ex-a-text li { margin-bottom:8px; }
+.ex-metrics-row { display:grid; grid-template-columns:repeat(3,1fr); gap:10px; margin:16px 0; }
+.ex-m { background:rgba(255,255,255,0.05); border:1px solid var(--ai-border); border-radius:10px; padding:12px; text-align:center; }
+.ex-m-val { font-family:'Syne',sans-serif; font-size:1.3rem; font-weight:800; }
+.ex-m-val.g{color:var(--ai-green)} .ex-m-val.o{color:var(--orange)} .ex-m-val.w{color:var(--ai-gold)}
+.ex-m-lbl { font-size:0.65rem; color:var(--ai-text3); margin-top:3px; text-transform:uppercase; letter-spacing:0.06em; }
+
+/* AI WAITLIST BAR */
+.ai-wl-bar { background:linear-gradient(135deg,rgba(255,107,53,0.15),rgba(240,180,41,0.1)); border:1px solid rgba(255,107,53,0.2); border-radius:20px; padding:48px; text-align:center; max-width:700px; margin:0 auto 100px; position:relative; z-index:2; }
+.ai-wl-title { font-family:'Syne',sans-serif; font-size:clamp(1.8rem,3vw,2.5rem); font-weight:800; letter-spacing:-0.03em; margin-bottom:12px; color:var(--ai-text); }
+.ai-wl-title em { font-style:italic; color:var(--orange); font-family:'Epilogue',sans-serif; }
+.ai-wl-sub { font-size:0.95rem; color:var(--ai-text2); margin-bottom:28px; line-height:1.65; }
+.ai-wl-form { display:flex; gap:10px; max-width:440px; margin:0 auto; }
+.ai-wl-input { flex:1; background:rgba(255,255,255,0.06); border:1px solid var(--ai-border2); border-radius:100px; padding:14px 20px; color:var(--ai-text); font-size:0.9rem; font-family:'DM Sans',sans-serif; outline:none; transition:border-color 0.2s; }
+.ai-wl-input:focus { border-color:rgba(255,107,53,0.5); }
+.ai-wl-input::placeholder { color:var(--ai-text3); }
+.ai-wl-btn { background:var(--orange); color:white; border:none; padding:14px 24px; border-radius:100px; font-size:0.88rem; font-weight:700; cursor:pointer; font-family:'DM Sans',sans-serif; white-space:nowrap; transition:all 0.22s; }
+.ai-wl-btn:hover { background:var(--orange2); transform:translateY(-1px); }
+.ai-wl-note { font-size:0.72rem; color:var(--ai-text3); margin-top:12px; }
+
+/* AI FOOTER */
+.ai-footer { border-top:1px solid var(--ai-border); padding:32px 6%; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:16px; position:relative; z-index:2; }
+.ai-foot-logo { font-family:'Syne',sans-serif; font-weight:800; font-size:1.1rem; color:var(--ai-text); }
+.ai-foot-logo em { font-style:normal; color:var(--orange); }
+.ai-foot-copy { font-size:0.78rem; color:var(--ai-text3); }
+.ai-foot-back { font-size:0.82rem; color:var(--ai-text3); cursor:pointer; transition:color 0.2s; background:none; border:none; font-family:'DM Sans',sans-serif; }
+.ai-foot-back:hover { color:var(--ai-text2); }
+
+/* RESPONSIVE */
+@media(max-width:900px) {
+  .split-section,.steps-flow,.features-grid,.testi-grid,.m-pricing-grid,.counter-inner,.vs-grid,.demo-layout,.ai-caps-grid,.ex-panel.show { grid-template-columns:1fr; flex-direction:column; }
+  .feat-card.wide { flex-direction:column; }
+  .step-block:first-child { border-radius:var(--r-lg) var(--r-lg) 0 0; }
+  .step-block:last-child { border-radius:0 0 var(--r-lg) var(--r-lg); }
+  .step-block:not(:first-child) { border-left:1px solid var(--border); border-top:none; }
+  .step-arrow { display:none; }
+  .wf-row,.mwl-form,.ai-wl-form { flex-direction:column; }
+  .wf-input,.mwl-input,.ai-wl-input { border-radius:var(--r-md); }
+  .wf-btn,.mwl-btn,.ai-wl-btn { border-radius:var(--r-md); }
+  .demo-sidebar { max-height:180px; border-right:none; border-bottom:1px solid var(--ai-border); }
+  .vs-divider-wrap { padding:0; }
+  .m-stats { gap:24px; flex-wrap:wrap; justify-content:center; }
+  .ai-sp-chat,.ai-sp-caps { display:none; }
+  .ai-spotlight-grid { grid-template-columns:1fr; }
+}
+</style>
 </head>
 <body>
 
-  <div class="container">
-    <h1>Sparkboard</h1>
-    <p>One page. Your entire company. Always in sync.</p>
+<!-- GRAIN -->
+<div id="grain"></div>
 
-    <h3>🚀 Launching Soon</h3>
+<!-- TOAST -->
+<div id="toast"></div>
 
-    <form id="emailForm">
-      <input type="email" id="email" placeholder="Enter your email" required />
-      <button type="submit">Join Waitlist</button>
-    </form>
+<!-- ══════════════════════════════════════
+     MAIN PAGE NAV
+══════════════════════════════════════ -->
+<nav id="mainNav">
+  <span class="logo-main" onclick="showPage('main')">Spark<em>board</em></span>
+  <div class="nav-right-main">
+    <button class="nav-ai-link" onclick="showPage('ai')">🤖 AI Co-Founder</button>
+    <div class="nav-tag"><div class="nav-dot"></div>Launching Soon</div>
+    <button class="nav-cta-btn" onclick="scrollToId('mainWaitlist')">Join Waitlist →</button>
+  </div>
+</nav>
 
-    <p id="successMsg" class="hidden">You're on the list 🎉</p>
+<!-- ══════════════════════════════════════
+     AI PAGE NAV
+══════════════════════════════════════ -->
+<nav id="aiNav" style="display:none;">
+  <span class="logo-ai" onclick="showPage('main')">Spark<em>board</em></span>
+  <div class="nav-ai-badge"><div class="ai-pulse"></div>Sparkboard AI — Co-Founder Mode</div>
+  <button class="nav-back-btn" onclick="showPage('main')">← Back to main site</button>
+</nav>
+
+<!-- ╔══════════════════════════════════════╗
+     ║           MAIN PAGE                  ║
+     ╚══════════════════════════════════════╝ -->
+<div id="mainPage" class="page active">
+  <div style="background:var(--cream); color:var(--ink);">
+
+  <!-- HERO -->
+  <section class="m-hero" id="mainHero">
+    <div class="m-hero-bg"></div>
+    <div class="countdown-banner">
+      <span class="cb-label">Launching in</span>
+      <div class="cb-timer">
+        <div class="cb-unit"><div class="cb-num" id="cd-days">00</div><div class="cb-lbl">days</div></div>
+        <div class="cb-colon">:</div>
+        <div class="cb-unit"><div class="cb-num" id="cd-hours">00</div><div class="cb-lbl">hrs</div></div>
+        <div class="cb-colon">:</div>
+        <div class="cb-unit"><div class="cb-num" id="cd-mins">00</div><div class="cb-lbl">min</div></div>
+        <div class="cb-colon">:</div>
+        <div class="cb-unit"><div class="cb-num" id="cd-secs">00</div><div class="cb-lbl">sec</div></div>
+      </div>
+      <span>🔥</span>
+    </div>
+    <h1>Stop the <span class="strike">chaos.</span><br>One page. Your <em>entire</em><br>company. In sync.</h1>
+    <p class="m-hero-sub">Replace 6 disconnected tools with one living page your whole team checks every morning. Auto-updated. Always fresh. <strong style="color:var(--fire);">Now with AI Co-Founder.</strong></p>
+    <div class="wf-row" id="heroFormArea">
+      <input class="wf-input" type="email" id="heroEmail" placeholder="Enter your work email">
+      <button class="wf-btn" onclick="joinWaitlist('hero')">Join Waitlist →</button>
+    </div>
+    <div class="m-social-proof">
+      <div class="avs">
+        <div class="av-sm av1">R</div><div class="av-sm av2">S</div>
+        <div class="av-sm av3">A</div><div class="av-sm av4">M</div><div class="av-sm av5">K</div>
+      </div>
+      <div class="proof-txt"><strong id="waitlistCount">3,247 founders and teams</strong> already on the waitlist</div>
+    </div>
+    <div class="m-stats">
+      <div class="ms"><div class="ms-num">6 → 1</div><div class="ms-lbl">Tools replaced</div></div>
+      <div class="ms"><div class="ms-num">4 min</div><div class="ms-lbl">Daily team sync</div></div>
+      <div class="ms"><div class="ms-num">98%</div><div class="ms-lbl">Retention rate</div></div>
+      <div class="ms"><div class="ms-num">10 min</div><div class="ms-lbl">Setup time</div></div>
+    </div>
+    <div class="scroll-hint"><div class="scroll-line"></div><div class="scroll-lbl">Scroll</div></div>
+  </section>
+
+  <!-- MARQUEE -->
+  <div class="marquee-section">
+    <div class="marquee-track">
+      <div class="marquee-item"><span class="marquee-sep">✦</span>One Page for Your Company</div>
+      <div class="marquee-item"><span class="marquee-sep">✦</span>Auto-Syncs from GitHub</div>
+      <div class="marquee-item"><span class="marquee-sep">✦</span>Live Stripe Metrics</div>
+      <div class="marquee-item"><span class="marquee-sep">✦</span>Investor View Link</div>
+      <div class="marquee-item"><span class="marquee-sep">✦</span>AI Co-Founder Built In</div>
+      <div class="marquee-item"><span class="marquee-sep">✦</span>No More Standups</div>
+      <div class="marquee-item"><span class="marquee-sep">✦</span>New Hire Onboarding</div>
+      <div class="marquee-item"><span class="marquee-sep">✦</span>Remote Teams Connected</div>
+      <div class="marquee-item"><span class="marquee-sep">✦</span>One Page for Your Company</div>
+      <div class="marquee-item"><span class="marquee-sep">✦</span>Auto-Syncs from GitHub</div>
+      <div class="marquee-item"><span class="marquee-sep">✦</span>Live Stripe Metrics</div>
+      <div class="marquee-item"><span class="marquee-sep">✦</span>Investor View Link</div>
+      <div class="marquee-item"><span class="marquee-sep">✦</span>AI Co-Founder Built In</div>
+      <div class="marquee-item"><span class="marquee-sep">✦</span>No More Standups</div>
+      <div class="marquee-item"><span class="marquee-sep">✦</span>New Hire Onboarding</div>
+      <div class="marquee-item"><span class="marquee-sep">✦</span>Remote Teams Connected</div>
+    </div>
   </div>
 
-  <script src="script.js"></script>
+  <!-- PROBLEM / SOLUTION -->
+  <section class="m-section reveal">
+    <div class="m-eyebrow">The problem we solve</div>
+    <h2 class="m-title">Your team uses <em>6 tools.</em><br>Nobody knows what's happening.</h2>
+    <div class="split-section">
+      <div class="split-side">
+        <div class="split-label sl-bad">❌ Before Sparkboard</div>
+        <div class="split-title">Every morning is chaos and confusion</div>
+        <div class="problem-list">
+          <div class="problem-item"><span class="pi-x">✕</span>6 tabs open — Notion, Slack, Trello, Linear, Drive, Analytics — nothing connects</div>
+          <div class="problem-item"><span class="pi-x">✕</span>Nobody knows what the #1 priority is this week. Everyone assumes differently.</div>
+          <div class="problem-item"><span class="pi-x">✕</span>New hires take 3 weeks to understand what the company is building and why</div>
+          <div class="problem-item"><span class="pi-x">✕</span>Investors ask for updates — you spend 2 hours manually compiling a report</div>
+        </div>
+      </div>
+      <div class="split-side dark">
+        <div class="split-label sl-good">✅ After Sparkboard</div>
+        <div class="split-title" style="color:var(--cream)">One page. Complete clarity. Every day.</div>
+        <div class="solution-list">
+          <div class="solution-item"><span class="si-check">✓</span>One page pulls everything together — priorities, metrics, team focus, decisions</div>
+          <div class="solution-item"><span class="si-check">✓</span>This week's #1 priority visible to every team member instantly</div>
+          <div class="solution-item"><span class="si-check">✓</span>New hires read 2 weeks of history and know everything in 10 minutes</div>
+          <div class="solution-item"><span class="si-check">✓</span>Share a private investor link — they see live metrics without bothering you</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- AI CO-FOUNDER SPOTLIGHT -->
+  <div class="ai-spotlight reveal" id="aiSpotlight">
+    <div class="ai-spotlight-grid">
+      <div class="ai-sp-left">
+        <div class="ai-sp-tag"><div class="ai-pulse"></div>New Feature — Coming at Launch</div>
+        <div class="ai-sp-title">Meet your <em>AI Co-Founder.</em><br>It knows your entire company.</div>
+        <div class="ai-sp-desc">Every other AI gives generic advice. Sparkboard AI reads your live metrics, your team's work, your decisions — and gives advice that's actually specific to your company. Ask anything. Get real answers.</div>
+        <button class="ai-sp-btn" onclick="showPage('ai')">Explore Sparkboard AI <span>→</span></button>
+        <div class="ai-sp-caps">
+          <div class="ai-sp-cap"><span class="ai-sp-cap-dot" style="background:var(--ai-green)"></span>Strategic advisor</div>
+          <div class="ai-sp-cap"><span class="ai-sp-cap-dot" style="background:var(--orange)"></span>Investor updates</div>
+          <div class="ai-sp-cap"><span class="ai-sp-cap-dot" style="background:var(--ai-gold)"></span>Growth analysis</div>
+          <div class="ai-sp-cap"><span class="ai-sp-cap-dot" style="background:var(--purple)"></span>Risk detection</div>
+        </div>
+      </div>
+      <div class="ai-sp-right">
+        <div class="ai-sp-chat">
+          <div class="ai-sp-chat-head">
+            <div class="ai-sp-av">🤖</div>
+            <div><div class="ai-sp-name">Sparkboard AI</div><div class="ai-sp-online"><div class="demo-live-dot"></div>Online · Knows your company</div></div>
+          </div>
+          <div class="ai-sp-chat-body">
+            <div class="ai-sp-msg">
+              <div class="ai-sp-msg-av">🤖</div>
+              <div class="ai-sp-bubble">Based on your MRR at $12.4K growing 23%/mo — <strong>don't raise yet.</strong> Wait 4 months. You'll get 3× better terms. Want me to model this out? 📊</div>
+            </div>
+            <div class="ai-sp-msg user">
+              <div class="ai-sp-msg-av u">👤</div>
+              <div class="ai-sp-bubble user">Should we raise funding?</div>
+            </div>
+            <div class="ai-sp-msg">
+              <div class="ai-sp-msg-av">🤖</div>
+              <div class="ai-sp-bubble">Your activation dropped 27% last month. Based on support ticket patterns, users are getting stuck at <strong>onboarding step 3.</strong> Priya should fix this before the landing page redesign. ⚠️</div>
+            </div>
+          </div>
+          <div class="ai-sp-footer">Powered by Claude AI · Launching with Sparkboard</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- HOW IT WORKS -->
+  <section class="m-section reveal" id="mainHow">
+    <div class="m-eyebrow">Simple setup</div>
+    <h2 class="m-title">Up and running in <em>10 minutes</em></h2>
+    <div class="steps-flow">
+      <div class="step-block">
+        <div class="step-num">01</div><span class="step-icon">✍️</span>
+        <div class="step-title">Create your board</div>
+        <div class="step-desc">Sign up, name your company, set your first priority. Live in 2 minutes. No setup call needed.</div>
+        <span class="step-time">⏱ 2 minutes</span>
+        <div class="step-arrow">→</div>
+      </div>
+      <div class="step-block">
+        <div class="step-num">02</div><span class="step-icon">🔗</span>
+        <div class="step-title">Connect your tools</div>
+        <div class="step-desc">Link GitHub, Stripe, Linear, Notion in one click. Metrics sync automatically every hour. Zero manual work.</div>
+        <span class="step-time">⏱ 5 minutes</span>
+        <div class="step-arrow">→</div>
+      </div>
+      <div class="step-block">
+        <div class="step-num">03</div><span class="step-icon">👥</span>
+        <div class="step-title">Invite your team</div>
+        <div class="step-desc">Paste emails. Team gets a read-only link. No account needed. Works on any device.</div>
+        <span class="step-time">⏱ 1 minute</span>
+        <div class="step-arrow">→</div>
+      </div>
+      <div class="step-block">
+        <div class="step-num">04</div><span class="step-icon">🌅</span>
+        <div class="step-title">Check it every morning</div>
+        <div class="step-desc">Team opens the board instead of a meeting. 4 minutes. Everyone aligned. Done.</div>
+        <span class="step-time">⏱ Daily</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- COUNTER -->
+  <div class="counter-section reveal">
+    <div class="counter-inner">
+      <div class="counter-item"><div class="ci-num"><span id="mainCount">3,247</span></div><div class="ci-lbl">On the waitlist</div></div>
+      <div class="counter-item"><div class="ci-num"><span>98</span>%</div><div class="ci-lbl">Beta retention</div></div>
+      <div class="counter-item"><div class="ci-num"><span>6</span> → <span>1</span></div><div class="ci-lbl">Tools replaced</div></div>
+      <div class="counter-item"><div class="ci-num"><span>4</span> min</div><div class="ci-lbl">Daily use</div></div>
+      <div class="counter-item"><div class="ci-num"><span>10</span> min</div><div class="ci-lbl">Setup to live</div></div>
+    </div>
+  </div>
+
+  <!-- FEATURES -->
+  <section class="m-section reveal" id="mainFeatures">
+    <div class="m-eyebrow">Everything included</div>
+    <h2 class="m-title">Everything your team <em>actually needs</em></h2>
+    <div class="features-grid">
+      <div class="feat-card"><span class="feat-icon">🎯</span><div class="feat-title">Weekly Priority Board</div><div class="feat-desc">Set one clear priority every Monday. Whole team sees it instantly. Progress tracked automatically.</div><span class="feat-tag">Core feature</span></div>
+      <div class="feat-card"><span class="feat-icon">📈</span><div class="feat-title">Live Metrics — Auto Updated</div><div class="feat-desc">MRR, users, NPS — whatever you connect syncs every hour automatically. Zero manual work.</div><span class="feat-tag">Auto-sync</span></div>
+      <div class="feat-card"><span class="feat-icon">🤖</span><div class="feat-title">AI Co-Founder</div><div class="feat-desc">Ask anything about your company. AI reads your real data and gives specific, actionable advice.</div><span class="feat-tag" style="cursor:pointer;" onclick="showPage('ai')">Explore →</span></div>
+      <div class="feat-card"><span class="feat-icon">📎</span><div class="feat-title">Investor View Link</div><div class="feat-desc">Share a private read-only link with investors. They see live metrics without accessing your tools.</div><span class="feat-tag">Investor ready</span></div>
+      <div class="feat-card"><span class="feat-icon">🗳️</span><div class="feat-title">Decision Log</div><div class="feat-desc">Every important decision recorded with date and context. Institutional knowledge preserved forever.</div><span class="feat-tag">Company memory</span></div>
+      <div class="feat-card"><span class="feat-icon">🆕</span><div class="feat-title">New Hire Onboarding</div><div class="feat-desc">New team member reads 2 weeks of history and knows everything in minutes — not weeks.</div><span class="feat-tag">Onboarding solved</span></div>
+      <div class="feat-card wide">
+        <div class="feat-wide-content"><span class="feat-icon">🔄</span><div class="feat-title">Auto-syncs from every tool you already use</div><div class="feat-desc">Connect GitHub → see commits live. Connect Stripe → revenue updates every hour. Connect Linear → sprint progress is live. No copy-pasting. No manual updates. The board is always fresh.</div><span class="feat-tag">20+ integrations</span></div>
+        <div class="feat-wide-visual">
+          <div class="fwv-line"><div class="fwv-dot green"></div> Stripe → MRR: $12,400 ↑ 23%</div>
+          <div class="fwv-line"><div class="fwv-dot green"></div> GitHub → 3 commits merged today</div>
+          <div class="fwv-line"><div class="fwv-dot gold"></div> Linear → Sprint: 67% complete</div>
+          <div class="fwv-line"><div class="fwv-dot green"></div> Analytics → 1,247 users ↑ 8%</div>
+          <div class="fwv-line"><div class="fwv-dot fire"></div> Priority → Ship payment flow (Fri)</div>
+          <div class="fwv-line" style="color:rgba(13,12,10,0.25);font-size:0.72rem;">↻ Last synced 2 minutes ago</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- INTEGRATIONS -->
+  <div class="int-section reveal">
+    <div class="int-title">Works with tools you <em>already use</em></div>
+    <div class="int-sub">Connect once. Updates forever. No manual work.</div>
+    <div class="int-grid">
+      <div class="int-chip">🐙 GitHub</div><div class="int-chip">💳 Stripe</div>
+      <div class="int-chip">📝 Notion</div><div class="int-chip">🐛 Linear</div>
+      <div class="int-chip">💬 Slack</div><div class="int-chip">📋 Trello</div>
+      <div class="int-chip">🎯 Jira</div><div class="int-chip">📊 Google Analytics</div>
+      <div class="int-chip">📁 Google Drive</div><div class="int-chip">🗓️ Calendly</div>
+      <div class="int-chip">📧 Mailchimp</div><div class="int-chip">⚡ Zapier</div>
+      <div class="int-chip">➕ 20+ more</div>
+    </div>
+  </div>
+
+  <!-- TESTIMONIALS -->
+  <section class="m-section reveal">
+    <div class="m-eyebrow">Early feedback</div>
+    <h2 class="m-title">From our <em>beta users</em></h2>
+    <div class="testi-grid">
+      <div class="testi-card"><div class="testi-stars">★★★★★</div><div class="testi-quote">"</div><div class="testi-text">We cancelled our daily standup after week 1. Everyone checks Sparkboard instead. Saved 30 minutes every day — 2.5 hours a week back to actual work.</div><div class="testi-auth"><div class="ta-av">S</div><div><div class="ta-name">Sarah K.</div><div class="ta-role">CTO · Series A SaaS · London</div></div></div></div>
+      <div class="testi-card"><div class="testi-stars">★★★★★</div><div class="testi-quote">"</div><div class="testi-text">Investors love the read-only view. Live metrics without bugging us for updates. One investor said we're the most transparent portfolio company they have.</div><div class="testi-auth"><div class="ta-av">A</div><div><div class="ta-name">Arjun M.</div><div class="ta-role">Founder · B2B marketplace · Bangalore</div></div></div></div>
+      <div class="testi-card"><div class="testi-stars">★★★★★</div><div class="testi-quote">"</div><div class="testi-text">New hires understand our company in their first hour now. Everything is documented. We went from 3 week onboarding to 1 day.</div><div class="testi-auth"><div class="ta-av">M</div><div><div class="ta-name">Maya R.</div><div class="ta-role">Head of People · Remote team · Toronto</div></div></div></div>
+    </div>
+  </section>
+
+  <!-- PRICING -->
+  <section class="m-section reveal" id="mainPricing" style="padding-bottom:60px;">
+    <div class="m-eyebrow">Simple pricing</div>
+    <h2 class="m-title">Waitlist members get <em>50% off</em> forever</h2>
+    <div class="m-pricing-grid">
+      <div class="m-price-card" style="opacity:0.65;">
+        <div class="plan-tier">Starter</div>
+        <div class="plan-price-num"><sup>$</sup><s style="font-size:1.8rem;color:var(--ink3);">19</s> <span style="color:var(--fire);">9</span></div>
+        <div class="plan-note">per month · waitlist price</div>
+        <ul class="plan-feats">
+          <li class="plan-feat"><span class="feat-check">✓</span>1 board · Up to 5 members</li>
+          <li class="plan-feat"><span class="feat-check">✓</span>3 integrations · 30 day history</li>
+          <li class="plan-feat"><span class="feat-x">✕</span>AI Co-Founder</li>
+        </ul>
+        <button class="plan-btn plan-btn-outline" onclick="scrollToId('mainWaitlist')">Join waitlist</button>
+      </div>
+      <div class="m-price-card featured">
+        <div class="hot-tag">Most Popular</div>
+        <div class="plan-tier" style="color:rgba(245,240,232,0.4);">Growth</div>
+        <div class="plan-price-num" style="color:var(--cream);"><sup>$</sup><s style="font-size:1.8rem;color:rgba(245,240,232,0.3);">49</s> <span style="color:var(--fire2);">24</span></div>
+        <div class="plan-note">per month · waitlist price</div>
+        <ul class="plan-feats">
+          <li class="plan-feat"><span class="feat-check">✓</span>Unlimited boards · 20 members</li>
+          <li class="plan-feat"><span class="feat-check">✓</span>Unlimited integrations</li>
+          <li class="plan-feat"><span class="feat-check">✓</span>AI Co-Founder included</li>
+          <li class="plan-feat"><span class="feat-check">✓</span>Investor view link</li>
+        </ul>
+        <button class="plan-btn plan-btn-white" onclick="scrollToId('mainWaitlist')">Join waitlist →</button>
+      </div>
+      <div class="m-price-card" style="opacity:0.65;">
+        <div class="plan-tier">Company</div>
+        <div class="plan-price-num"><sup>$</sup><s style="font-size:1.8rem;color:var(--ink3);">99</s> <span style="color:var(--fire);">49</span></div>
+        <div class="plan-note">per month · waitlist price</div>
+        <ul class="plan-feats">
+          <li class="plan-feat"><span class="feat-check">✓</span>Unlimited members · API</li>
+          <li class="plan-feat"><span class="feat-check">✓</span>Custom domain</li>
+          <li class="plan-feat"><span class="feat-check">✓</span>AI Co-Founder for team</li>
+        </ul>
+        <button class="plan-btn plan-btn-outline" onclick="scrollToId('mainWaitlist')">Join waitlist</button>
+      </div>
+    </div>
+    <div style="text-align:center;margin-top:20px;font-size:0.82rem;color:var(--ink3);">🔒 50% discount locked forever for waitlist members</div>
+  </section>
+
+  <!-- FAQ -->
+  <section class="m-section reveal" style="padding-bottom:60px;">
+    <div class="m-eyebrow">Questions</div>
+    <h2 class="m-title">Everything you want to <em>know</em></h2>
+    <div class="faq-wrap">
+      <div class="faq-item"><button class="faq-q" onclick="toggleFaq(this)">When does Sparkboard launch?<span class="faq-plus">+</span></button><div class="faq-a">We're launching in the coming weeks. Everyone on the waitlist gets early access before the public launch, plus the 50% lifetime discount.</div></div>
+      <div class="faq-item"><button class="faq-q" onclick="toggleFaq(this)">What is Sparkboard AI exactly?<span class="faq-plus">+</span></button><div class="faq-a">Sparkboard AI is your AI Co-Founder — it reads your live metrics, team work, decision history, and priorities, then gives advice specific to YOUR company. Not generic ChatGPT answers. Real insights based on your real data. Ask anything: funding strategy, investor updates, team performance, growth analysis.</div></div>
+      <div class="faq-item"><button class="faq-q" onclick="toggleFaq(this)">Does my whole team need to sign up?<span class="faq-plus">+</span></button><div class="faq-a">No. Only the admin needs an account. Team members get a read-only link they bookmark. No new app to learn. Works on any device.</div></div>
+      <div class="faq-item"><button class="faq-q" onclick="toggleFaq(this)">How is this different from Notion or Confluence?<span class="faq-plus">+</span></button><div class="faq-a">Notion and Confluence are document tools you manually update and nobody reads. Sparkboard auto-syncs from your real tools and shows live data. It's a dashboard, not a document. Your team actually opens it every day.</div></div>
+      <div class="faq-item"><button class="faq-q" onclick="toggleFaq(this)">Is there a free trial?<span class="faq-plus">+</span></button><div class="faq-a">Yes. All waitlist members get 30 days free when we launch. No credit card required.</div></div>
+      <div class="faq-item"><button class="faq-q" onclick="toggleFaq(this)">Is my company data secure?<span class="faq-plus">+</span></button><div class="faq-a">All data encrypted at rest and in transit. We only read the specific metrics you authorize. SOC 2 compliant at launch.</div></div>
+    </div>
+  </section>
+
+  <!-- MAIN WAITLIST -->
+  <div class="m-waitlist-section" id="mainWaitlist">
+    <div class="mwl-glow"></div>
+    <div class="mwl-eyebrow"><div class="mwl-dot"></div>Join the waitlist · Limited spots</div>
+    <div class="mwl-title">Be first.<br>Pay <em>half price.</em><br>Forever.</div>
+    <div class="mwl-sub">Join 3,247 founders and teams waiting for Sparkboard. Waitlist members get 50% off — locked in for life.</div>
+    <div id="mainWlFormWrap">
+      <div class="mwl-form">
+        <input class="mwl-input" type="email" id="mainWlEmail" placeholder="Your work email address">
+        <button class="mwl-btn" onclick="joinWaitlist('main')">Get Early Access →</button>
+      </div>
+      <div class="mwl-guarantee">🔒 No spam ever · Unsubscribe anytime · 50% off locked forever</div>
+    </div>
+    <div class="mwl-success" id="mainWlSuccess">
+      <div style="font-size:2.5rem;margin-bottom:12px;">🎉</div>
+      <div style="font-family:'Playfair Display',serif;font-size:1.4rem;font-weight:700;color:var(--cream);margin-bottom:8px;">You're on the list!</div>
+      <div style="font-size:0.88rem;color:rgba(245,240,232,0.5);line-height:1.6;">Check your email. 50% off locked in forever. You'll be first to get access when we launch.</div>
+    </div>
+    <div class="mwl-perks">
+      <div class="mwl-perk"><span class="mwl-perk-icon">⚡</span>Early access before public launch</div>
+      <div class="mwl-perk"><span class="mwl-perk-icon">💰</span>50% off forever</div>
+      <div class="mwl-perk"><span class="mwl-perk-icon">🎁</span>30 day free trial</div>
+      <div class="mwl-perk"><span class="mwl-perk-icon">🤝</span>Direct access to founding team</div>
+    </div>
+  </div>
+
+  <!-- FOOTER -->
+  <footer class="m-footer">
+    <div class="m-foot-logo">Spark<em>board</em></div>
+    <ul class="m-foot-links">
+      <li><a href="#">Privacy</a></li>
+      <li><a href="#">Terms</a></li>
+      <li><a href="#">Contact</a></li>
+      <li><a href="#" onclick="showPage('ai');return false;">AI Co-Founder</a></li>
+    </ul>
+    <div class="m-foot-copy">© 2026 Sparkboard · All rights reserved</div>
+  </footer>
+
+  </div><!-- /background wrapper -->
+</div><!-- /mainPage -->
+
+
+<!-- ╔══════════════════════════════════════╗
+     ║           AI CO-FOUNDER PAGE         ║
+     ╚══════════════════════════════════════╝ -->
+<div id="aiPage" class="page">
+  <div style="background:var(--ai-bg);color:var(--ai-text);">
+
+  <!-- AI HERO -->
+  <section class="ai-hero">
+    <div class="ai-hero-glow"></div>
+    <div class="ai-hero-tag"><div class="ai-pulse"></div>Coming Soon · Sparkboard AI</div>
+    <h1>Your <span class="orange-txt">AI Co-Founder</span><br><span class="dim-txt">that actually knows</span><br>your company.</h1>
+    <p class="ai-hero-sub">Every other AI gives generic advice. Sparkboard AI reads your live metrics, your team's work, your decision history — and gives advice specific to <em>your</em> company.</p>
+    <div class="ai-hero-ctas">
+      <button class="ai-btn-primary" onclick="document.getElementById('aiDemo').scrollIntoView({behavior:'smooth'})">Try the Live Demo ↓</button>
+      <button class="ai-btn-ghost" onclick="document.getElementById('aiExamples').scrollIntoView({behavior:'smooth'})">See Real Examples</button>
+    </div>
+    <div class="caps-row">
+      <div class="cap-pill"><span class="cap-dot" style="background:var(--ai-green)"></span>Strategic advisor</div>
+      <div class="cap-pill"><span class="cap-dot" style="background:var(--ai-blue)"></span>Investor updates</div>
+      <div class="cap-pill"><span class="cap-dot" style="background:var(--ai-gold)"></span>Business analyst</div>
+      <div class="cap-pill"><span class="cap-dot" style="background:var(--purple)"></span>Team coach</div>
+      <div class="cap-pill"><span class="cap-dot" style="background:var(--orange)"></span>Growth forecaster</div>
+      <div class="cap-pill"><span class="cap-dot" style="background:var(--ai-red)"></span>Risk detector</div>
+    </div>
+  </section>
+
+  <!-- VS SECTION -->
+  <section class="ai-section reveal">
+    <div class="ai-eyebrow">The difference</div>
+    <h2 class="ai-title">Generic AI vs <em>Your</em> AI</h2>
+    <div class="vs-grid">
+      <div class="vs-card bad-ai">
+        <div class="vs-label-ai bad">✕ ChatGPT / Generic AI</div>
+        <div class="vs-item-ai"><span class="vs-ic x">✕</span>"Your churn might be caused by onboarding issues" — no idea about YOUR onboarding</div>
+        <div class="vs-item-ai"><span class="vs-ic x">✕</span>Doesn't know your MRR, growth rate, or burn rate</div>
+        <div class="vs-item-ai"><span class="vs-ic x">✕</span>Can't see what your team is working on right now</div>
+        <div class="vs-item-ai"><span class="vs-ic x">✕</span>No memory of past decisions you made</div>
+        <div class="vs-item-ai"><span class="vs-ic x">✕</span>Same answer for every founder in your industry</div>
+        <div class="vs-item-ai"><span class="vs-ic x">✕</span>You explain your company from scratch every time</div>
+      </div>
+      <div class="vs-divider-wrap"><div class="vs-vs">VS</div></div>
+      <div class="vs-card good-ai">
+        <div class="vs-label-ai good">✓ Sparkboard AI</div>
+        <div class="vs-item-ai"><span class="vs-ic c">✓</span>"Your activation dropped 12% in week 3 — here's exactly why based on your data"</div>
+        <div class="vs-item-ai"><span class="vs-ic c">✓</span>Knows your MRR ($12.4K), growth (23%), runway, and trends</div>
+        <div class="vs-item-ai"><span class="vs-ic c">✓</span>Sees Rahul on payments, Priya on design, Ahmed in support</div>
+        <div class="vs-item-ai"><span class="vs-ic c">✓</span>Remembers you dropped feature X last month and why</div>
+        <div class="vs-item-ai"><span class="vs-ic c">✓</span>Advice based on YOUR situation — nobody else's</div>
+        <div class="vs-item-ai"><span class="vs-ic c">✓</span>Always knows your company — lives inside your Sparkboard</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- LIVE DEMO -->
+  <div class="ai-demo-section reveal" id="aiDemo">
+    <div class="ai-eyebrow" style="text-align:center;margin-bottom:14px;">Interactive demo</div>
+    <h2 class="ai-title" style="margin-bottom:12px;">Ask it anything. <em>Right now.</em></h2>
+    <div style="text-align:center;font-size:0.9rem;color:var(--ai-text3);margin-bottom:28px;">Click a question or type your own below</div>
+    <div class="demo-shell">
+      <div class="demo-bar">
+        <div class="demo-bar-dots"><div class="d-dot"></div><div class="d-dot"></div><div class="d-dot"></div></div>
+        <div class="demo-bar-title">sparkboard.ai — Acme Corp · Co-Founder Mode</div>
+        <div class="demo-live-badge"><div class="demo-live-dot"></div>Live</div>
+      </div>
+      <div class="demo-layout">
+        <div class="demo-sidebar">
+          <div class="sb-head">
+            <div class="sb-ai-av">🤖</div>
+            <div class="sb-ai-name">Sparkboard AI</div>
+            <div class="sb-ai-status"><div class="demo-live-dot"></div>Online · Knows your company</div>
+          </div>
+          <div class="sb-data">
+            <div class="sb-data-lbl">What I know right now</div>
+            <div class="sb-data-row">📈 MRR<span class="sb-data-val g">$12,400</span></div>
+            <div class="sb-data-row">📊 Growth<span class="sb-data-val g">+23%</span></div>
+            <div class="sb-data-row">👥 Team<span class="sb-data-val">8 people</span></div>
+            <div class="sb-data-row">🎯 Priority<span class="sb-data-val w">Payment flow</span></div>
+            <div class="sb-data-row">⚠️ Activation<span class="sb-data-val r">↓12%</span></div>
+            <div class="sb-data-row">💰 Runway<span class="sb-data-val">9 months</span></div>
+          </div>
+          <div class="sb-topics">
+            <div class="sb-topics-lbl">Ask about</div>
+            <div class="sb-topic active" onclick="setAITopic(this,'funding')">💰 Funding strategy</div>
+            <div class="sb-topic" onclick="setAITopic(this,'growth')">📈 Growth analysis</div>
+            <div class="sb-topic" onclick="setAITopic(this,'team')">👥 Team performance</div>
+            <div class="sb-topic" onclick="setAITopic(this,'investor')">📎 Investor updates</div>
+            <div class="sb-topic" onclick="setAITopic(this,'hiring')">🔍 Hiring decisions</div>
+            <div class="sb-topic" onclick="setAITopic(this,'forecast')">🔮 Forecasting</div>
+          </div>
+        </div>
+        <div class="chat-area">
+          <div class="chat-msgs" id="aiChatMsgs">
+            <div class="ai-msg">
+              <div class="ai-msg-av">🤖</div>
+              <div>
+                <div class="ai-bubble">Hey! I'm your Sparkboard AI Co-Founder. I have full access to your company data — MRR, team, priorities, and decision history.<br><br><strong>Ask me anything.</strong> I'll give you advice based on your actual numbers. Try a question below 👇</div>
+                <div class="ai-msg-time">Sparkboard AI · just now</div>
+              </div>
+            </div>
+          </div>
+          <div class="quick-row" id="aiQuickBtns">
+            <button class="quick-btn" onclick="sendAIQuick(this,'Should we raise funding right now?')">💰 Should we raise?</button>
+            <button class="quick-btn" onclick="sendAIQuick(this,'Why is our activation dropping?')">📉 Activation dropping?</button>
+            <button class="quick-btn" onclick="sendAIQuick(this,'Write my investor update for this month')">✍️ Investor update</button>
+            <button class="quick-btn" onclick="sendAIQuick(this,'Who is my best performing team member?')">🏆 Best performer?</button>
+            <button class="quick-btn" onclick="sendAIQuick(this,'When will we hit $100K MRR?')">🔮 Hit $100K MRR?</button>
+            <button class="quick-btn" onclick="sendAIQuick(this,'What is our biggest risk right now?')">⚠️ Biggest risk?</button>
+          </div>
+          <div class="chat-inp-wrap">
+            <div class="chat-inp-row">
+              <input class="chat-inp-field" id="aiChatInput" type="text" placeholder="Ask anything about your company...">
+              <button class="chat-send-btn" id="aiSendBtn" onclick="sendAIMessage()">→</button>
+            </div>
+            <div class="chat-hint-txt">Demo uses sample Acme Corp data · Real version uses YOUR company data</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- CAPABILITIES -->
+  <section class="ai-section reveal">
+    <div class="ai-eyebrow">Everything it can do</div>
+    <h2 class="ai-title">6 things your <em>AI Co-Founder</em> does daily</h2>
+    <div class="ai-caps-grid">
+      <div class="ai-cap-card"><span class="ai-cap-icon">📊</span><div class="ai-cap-title">Business Intelligence</div><div class="ai-cap-desc">Analyzes your live metrics and tells you what's happening — not just numbers, but what they mean.</div><div class="ai-cap-examples"><div class="ai-cap-ex">"Why did our churn spike last month?"</div><div class="ai-cap-ex">"Which segment is growing fastest?"</div></div></div>
+      <div class="ai-cap-card"><span class="ai-cap-icon">🧭</span><div class="ai-cap-title">Strategic Advice</div><div class="ai-cap-desc">Real strategic recommendations based on your actual situation — funding, hiring, product, pricing.</div><div class="ai-cap-examples"><div class="ai-cap-ex">"Should we raise a seed round now?"</div><div class="ai-cap-ex">"When should we hire our first salesperson?"</div></div></div>
+      <div class="ai-cap-card"><span class="ai-cap-icon">✍️</span><div class="ai-cap-title">Write For You</div><div class="ai-cap-desc">Drafts investor updates, board agendas, all-hands notes using your real metrics — not generic templates.</div><div class="ai-cap-examples"><div class="ai-cap-ex">"Write my April investor update"</div><div class="ai-cap-ex">"Draft our Q2 all-hands agenda"</div></div></div>
+      <div class="ai-cap-card"><span class="ai-cap-icon">⚠️</span><div class="ai-cap-title">Risk Detection</div><div class="ai-cap-desc">Monitors metrics, team load, runway, and growth to flag risks before they become crises.</div><div class="ai-cap-examples"><div class="ai-cap-ex">"What are our biggest risks right now?"</div><div class="ai-cap-ex">"When does our runway run out?"</div></div></div>
+      <div class="ai-cap-card"><span class="ai-cap-icon">🔮</span><div class="ai-cap-title">Growth Forecasting</div><div class="ai-cap-desc">Models your growth trajectory based on real trends — when you'll hit milestones, not based on hope.</div><div class="ai-cap-examples"><div class="ai-cap-ex">"When do we hit $100K MRR?"</div><div class="ai-cap-ex">"Model growth if we hire 2 engineers"</div></div></div>
+      <div class="ai-cap-card"><span class="ai-cap-icon">👥</span><div class="ai-cap-title">Team Coaching</div><div class="ai-cap-desc">Reviews performance, workload, and bottlenecks. Tells you who needs help and what to change.</div><div class="ai-cap-examples"><div class="ai-cap-ex">"Who is my best performer this week?"</div><div class="ai-cap-ex">"Who needs support right now?"</div></div></div>
+    </div>
+  </section>
+
+  <!-- EXAMPLES -->
+  <div style="background:var(--ai-surface);border-top:1px solid var(--ai-border);border-bottom:1px solid var(--ai-border);padding:100px 6%;position:relative;z-index:2;" class="reveal" id="aiExamples">
+    <div style="max-width:1100px;margin:0 auto;">
+      <div class="ai-eyebrow" style="text-align:center;">Real examples</div>
+      <h2 class="ai-title" style="margin-bottom:40px;">See exactly what it <em>says</em></h2>
+      <div class="ex-tabs">
+        <button class="ex-tab active" onclick="switchExTab(this,'aifunding')">💰 Funding</button>
+        <button class="ex-tab" onclick="switchExTab(this,'aigrowth')">📈 Growth</button>
+        <button class="ex-tab" onclick="switchExTab(this,'aiinvestor')">📎 Investor Update</button>
+        <button class="ex-tab" onclick="switchExTab(this,'aiteam')">👥 Team</button>
+        <button class="ex-tab" onclick="switchExTab(this,'airisk')">⚠️ Risk</button>
+      </div>
+
+      <div class="ex-panel show" id="ex-aifunding">
+        <div class="ex-q-card"><div class="ex-q-lbl">👤 Founder asks</div><div class="ex-q-text">"Should we raise a seed round right now?"</div><div class="ex-context-box"><div class="ex-ctx-lbl">🧠 What AI knows</div>MRR: $12,400 · Growth: 23%/mo · Team: 8 · Runway: 9mo · Burn: $18K/mo</div></div>
+        <div class="ex-a-card"><div class="ex-a-lbl">🤖 Sparkboard AI answers</div><div class="ex-a-text"><strong>My honest recommendation: wait 4-5 months before raising.</strong><div class="ex-metrics-row"><div class="ex-m"><div class="ex-m-val g">$12.4K</div><div class="ex-m-lbl">Current MRR</div></div><div class="ex-m"><div class="ex-m-val o">23%</div><div class="ex-m-lbl">MoM Growth</div></div><div class="ex-m"><div class="ex-m-val w">9mo</div><div class="ex-m-lbl">Runway</div></div></div>At <span class="g-t">23%/mo growth</span>, you'll be at <span class="g-t">~$34K MRR</span> in 4 months. That's a completely different fundraise — better valuation, less dilution.<br><br><strong>If you raise today:</strong> $3-5M at maybe $8M valuation. Give up 25%.<br><strong>If you wait 5 months:</strong> Same $3-4M at $15-20M valuation. Give up 20%.<br><br><span class="o-t">Bottom line:</span> Your current growth is your leverage. Don't give it away cheap.</div></div>
+      </div>
+
+      <div class="ex-panel" id="ex-aigrowth">
+        <div class="ex-q-card"><div class="ex-q-lbl">👤 Founder asks</div><div class="ex-q-text">"Why is our activation rate dropping?"</div><div class="ex-context-box"><div class="ex-ctx-lbl">🧠 What AI knows</div>Activation: 68% → 41% (last 30 days) · Support tickets ↑34% · Priya on landing redesign</div></div>
+        <div class="ex-a-card"><div class="ex-a-lbl">🤖 Sparkboard AI answers</div><div class="ex-a-text">Activation dropped from <span class="g-t">68%</span> to <span class="r-t">41%</span> — a <span class="r-t">27-point drop</span> in 30 days. Serious.<br><br>Three likely causes:<ul><li><span class="o-t">Step 3 drop-off:</span> Support tickets up 34%, mostly onboarding questions. Something broke at step 3.</li><li><span class="w-t">Traffic quality:</span> If you changed ad targeting recently, you may be bringing in wrong-fit users.</li><li><span class="o-t">Team bandwidth:</span> Priya is on landing page. Was onboarding her responsibility? Quick check needed.</li></ul><strong>My suggestion:</strong> Redirect Priya to a 2-day onboarding audit. Every week this drops costs compounding revenue.</div></div>
+      </div>
+
+      <div class="ex-panel" id="ex-aiinvestor">
+        <div class="ex-q-card"><div class="ex-q-lbl">👤 Founder asks</div><div class="ex-q-text">"Write my April investor update"</div><div class="ex-context-box"><div class="ex-ctx-lbl">🧠 What AI knows</div>MRR: $12.4K (+23%) · Users: 1,247 (+8%) · Shipped: dark mode, CSV export · Ask: fintech intros</div></div>
+        <div class="ex-a-card"><div class="ex-a-lbl">🤖 Sparkboard AI writes</div><div class="ex-a-text"><strong>Subject: Acme Corp — April 2026 Update 🚀</strong><br><br>Hi [Name],<br><br>Strong month. Quick version:<br><br><strong>📈 Numbers</strong><br>• MRR: <span class="g-t">$12,400</span> — up <span class="g-t">23% MoM</span><br>• Users: 1,247 — up 8% WoW<br>• Shipped: dark mode + CSV export<br><br><strong>🎯 Focus</strong><br>Shipping payment flow to unlock 3 enterprise deals (~$4K MRR).<br><br><strong>⚠️ Flag</strong><br>Activation dropped 27%. Team redirected to fix this week.<br><br><strong>🤝 Ask</strong><br>Intros to fintech founders in your portfolio.<br><br>Live metrics: sparkboard.io/acme/investor</div></div>
+      </div>
+
+      <div class="ex-panel" id="ex-aiteam">
+        <div class="ex-q-card"><div class="ex-q-lbl">👤 Founder asks</div><div class="ex-q-text">"Who is my best performing team member?"</div><div class="ex-context-box"><div class="ex-ctx-lbl">🧠 What AI knows</div>Rahul: payments 67% · Priya: landing in review · Ahmed: support ongoing 3wks · Sara: done ✓</div></div>
+        <div class="ex-a-card"><div class="ex-a-lbl">🤖 Sparkboard AI answers</div><div class="ex-a-text"><strong>🏆 This week's standout: Sara Chen</strong><br>Only team member with a <span class="g-t">✓ Done</span> status — completed user interviews ahead of schedule.<br><br><strong>📌 Close second: Rahul</strong><br>Payment integration at 67% on the most complex task on the board. Good pace, high stakes.<br><br><span class="r-t">⚠️ Concern: Ahmed</span><br>Support backlog marked "ongoing" for <strong>3 consecutive weeks.</strong> Not performance — probably needs a prioritization conversation. Short 1:1 this week, not a review.</div></div>
+      </div>
+
+      <div class="ex-panel" id="ex-airisk">
+        <div class="ex-q-card"><div class="ex-q-lbl">👤 Founder asks</div><div class="ex-q-text">"What are our biggest risks right now?"</div><div class="ex-context-box"><div class="ex-ctx-lbl">🧠 What AI knows</div>Runway: 9mo · Activation: ↓27% · 3 enterprise deals blocked · Ahmed backlog ongoing</div></div>
+        <div class="ex-a-card"><div class="ex-a-lbl">🤖 Sparkboard AI answers</div><div class="ex-a-text"><strong>3 significant risks, ranked by urgency:</strong><br><br><span class="r-t">🔴 Risk 1 — Activation collapse (Urgent)</span><br>Down 27% in 30 days. Compounds weekly. Fix this week.<br><br><span class="w-t">🟡 Risk 2 — Revenue concentration (Medium)</span><br>3 enterprise deals = 32% of your next growth milestone. One falls through = story changes for investors.<br><br><span class="w-t">🟡 Risk 3 — Runway compression (Watch)</span><br>9 months is fine but if growth slows you'll want to fundraise in 4-5 months. Don't let it sneak up.<br><br><strong>Good news:</strong> All 3 are fixable. None are existential yet.</div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- AI WAITLIST -->
+  <div style="padding:100px 6%;position:relative;z-index:2;">
+    <div class="ai-wl-bar reveal">
+      <div class="ai-wl-title">Get early access to <em>Sparkboard AI</em></div>
+      <div class="ai-wl-sub">Join the waitlist. Be first to use the AI that actually knows your company. 50% off forever for waitlist members.</div>
+      <div class="ai-wl-form">
+        <input class="ai-wl-input" type="email" id="aiWlEmail" placeholder="Your work email">
+        <button class="ai-wl-btn" onclick="joinAIWaitlist()">Get Early Access →</button>
+      </div>
+      <div class="ai-wl-note">🔒 No spam · 50% off locked forever · 30 day free trial at launch</div>
+    </div>
+  </div>
+
+  <!-- AI FOOTER -->
+  <footer class="ai-footer">
+    <div class="ai-foot-logo">Spark<em>board</em></div>
+    <div class="ai-foot-copy">© 2026 Sparkboard · Sparkboard AI — Coming Soon</div>
+    <button class="ai-foot-back" onclick="showPage('main')">← Back to main site</button>
+  </footer>
+
+  </div><!-- /background wrapper -->
+</div><!-- /aiPage -->
+
+
+<!-- ══════════════════════════════════════
+     JAVASCRIPT — ALL FUNCTIONALITY
+══════════════════════════════════════ -->
+<script>
+// ─── PAGE SWITCHING ───
+function showPage(page) {
+  document.getElementById('mainPage').classList.remove('active');
+  document.getElementById('aiPage').classList.remove('active');
+  document.getElementById('mainNav').style.display = '';
+  document.getElementById('aiNav').style.display = 'none';
+
+  if (page === 'ai') {
+    document.getElementById('aiPage').classList.add('active');
+    document.getElementById('aiNav').style.display = 'flex';
+    document.getElementById('mainNav').style.display = 'none';
+    window.scrollTo(0,0);
+    setTimeout(initReveal, 100);
+  } else {
+    document.getElementById('mainPage').classList.add('active');
+    window.scrollTo(0,0);
+    setTimeout(initReveal, 100);
+  }
+}
+
+// ─── SCROLL TO ELEMENT ───
+function scrollToId(id) {
+  const el = document.getElementById(id);
+  if (el) el.scrollIntoView({behavior:'smooth'});
+}
+
+// ─── TOAST ───
+function showToast(msg, type='main') {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = 'show ' + (type === 'ai' ? 'ai-toast' : 'main-toast');
+  setTimeout(() => t.className = t.className.replace('show','').trim(), 3200);
+}
+
+// ─── COUNTDOWN ───
+function updateCountdown() {
+  const launch = new Date('2026-05-27T00:00:00');
+  const diff = launch - new Date();
+  if (diff <= 0) return;
+  const d = Math.floor(diff/(1000*60*60*24));
+  const h = Math.floor((diff%(1000*60*60*24))/(1000*60*60));
+  const m = Math.floor((diff%(1000*60*60))/(1000*60));
+  const s = Math.floor((diff%(1000*60))/1000);
+  const set = (id,v) => { const el=document.getElementById(id); if(el) el.textContent=String(v).padStart(2,'0'); };
+  set('cd-days',d); set('cd-hours',h); set('cd-mins',m); set('cd-secs',s);
+}
+updateCountdown(); setInterval(updateCountdown,1000);
+
+// ─── WAITLIST COUNT ───
+let wlCount = 3247;
+function incrementCount() {
+  wlCount += Math.floor(Math.random()*3);
+  const f = n => n.toLocaleString();
+  ['waitlistCount','mainCount'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.textContent = (id==='waitlistCount' ? f(wlCount)+' founders and teams' : f(wlCount));
+  });
+}
+setInterval(incrementCount, 9000);
+
+// ─── JOIN WAITLIST ───
+function joinWaitlist(source) {
+  const emailId = source==='hero' ? 'heroEmail' : 'mainWlEmail';
+  const email = document.getElementById(emailId)?.value?.trim();
+  if (!email || !email.includes('@')) {
+    showToast('Please enter a valid email address');
+    return;
+  }
+  const btn = source==='hero'
+    ? document.querySelector('.wf-btn')
+    : document.querySelector('.mwl-btn');
+  if (btn) { btn.textContent='Adding you...'; btn.style.opacity='0.7'; btn.disabled=true; }
+  setTimeout(() => {
+    if (source==='hero') {
+      document.getElementById('heroFormArea').innerHTML = `<div style="background:rgba(26,107,60,0.1);border:1px solid rgba(26,107,60,0.2);border-radius:14px;padding:20px 28px;text-align:center;max-width:520px;"><div style="font-size:1.5rem;margin-bottom:8px;">🎉</div><div style="font-weight:700;font-size:1rem;margin-bottom:6px;color:var(--ink);">You're on the list!</div><div style="font-size:0.85rem;color:var(--ink2);">Check your email. 50% off locked in forever.</div></div>`;
+    } else {
+      document.getElementById('mainWlFormWrap').style.display='none';
+      document.getElementById('mainWlSuccess').classList.add('show');
+    }
+    incrementCount();
+    showToast('🎉 You\'re on the waitlist! Check your email.', 'main');
+  }, 1200);
+}
+
+// ─── AI WAITLIST ───
+function joinAIWaitlist() {
+  const email = document.getElementById('aiWlEmail')?.value?.trim();
+  if (!email || !email.includes('@')) { showToast('Please enter a valid email', 'ai'); return; }
+  const btn = document.querySelector('.ai-wl-btn');
+  if (btn) { btn.textContent='Adding you...'; btn.style.opacity='0.7'; }
+  setTimeout(() => {
+    if (btn) { btn.textContent='✓ You\'re on the list!'; btn.style.background='var(--ai-green)'; btn.style.opacity='1'; }
+    incrementCount();
+    showToast('🎉 You\'re on the waitlist! Check your email.', 'ai');
+  }, 1200);
+}
+document.addEventListener('keypress', e => {
+  if (e.key === 'Enter') {
+    const active = document.querySelector('.page.active');
+    if (active?.id === 'mainPage') {
+      const heroEmail = document.getElementById('heroEmail');
+      const mainWlEmail = document.getElementById('mainWlEmail');
+      if (document.activeElement === heroEmail) joinWaitlist('hero');
+      if (document.activeElement === mainWlEmail) joinWaitlist('main');
+    }
+    if (active?.id === 'aiPage') {
+      if (document.activeElement === document.getElementById('aiWlEmail')) joinAIWaitlist();
+      if (document.activeElement === document.getElementById('aiChatInput')) sendAIMessage();
+    }
+  }
+});
+
+// ─── FAQ ───
+function toggleFaq(btn) {
+  const item = btn.parentElement;
+  const isOpen = item.classList.contains('open');
+  document.querySelectorAll('.faq-item.open').forEach(i => i.classList.remove('open'));
+  if (!isOpen) item.classList.add('open');
+}
+
+// ─── EXAMPLE TABS ───
+function switchExTab(btn, id) {
+  document.querySelectorAll('.ex-tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.ex-panel').forEach(p => p.classList.remove('show'));
+  btn.classList.add('active');
+  document.getElementById('ex-'+id)?.classList.add('show');
+}
+
+// ─── AI SIDEBAR TOPICS ───
+function setAITopic(el, topic) {
+  document.querySelectorAll('.sb-topic').forEach(t => t.classList.remove('active'));
+  el.classList.add('active');
+  const map = {
+    funding:'Should we raise funding right now?',
+    growth:'Why is our activation dropping?',
+    team:'Who is my best performing team member?',
+    investor:'Write my investor update for this month',
+    hiring:'When should we make our next hire?',
+    forecast:'When will we hit $100K MRR?'
+  };
+  const input = document.getElementById('aiChatInput');
+  if (input && map[topic]) { input.value = map[topic]; input.focus(); }
+}
+
+// ─── AI CHAT ───
+const aiResponses = {
+  'raise|funding|seed|invest': {
+    html: `Based on your metrics, <strong>my honest recommendation is to wait 4-5 months.</strong><div class="ai-mini-metrics"><div class="ai-mini-m"><div class="ai-mini-m-val g">$12.4K</div><div class="ai-mini-m-lbl">MRR</div></div><div class="ai-mini-m"><div class="ai-mini-m-val o">23%</div><div class="ai-mini-m-lbl">MoM Growth</div></div><div class="ai-mini-m"><div class="ai-mini-m-val w">9mo</div><div class="ai-mini-m-lbl">Runway</div></div></div>At 23%/mo growth you'll hit <span class="g-txt">~$34K MRR in 4 months.</span> That's a completely different fundraise — better valuation, less dilution. Don't raise today when your leverage is growing this fast.`
+  },
+  'activation|dropping|drop|churn': {
+    html: `Activation dropped from <strong>68% → 41%</strong> — a <span class="r-txt">27-point drop</span> in 30 days. Three likely causes based on your board:<br><br>1. <span class="o-txt">Step 3 drop-off</span> — Support tickets up 34%, mostly onboarding questions<br>2. <span class="w-txt">Traffic quality shift</span> — Changed ad targeting recently?<br>3. <span class="o-txt">Team bandwidth</span> — Priya is on landing page. Was onboarding hers?<br><br><strong>Action:</strong> Redirect Priya to a 2-day onboarding audit. Every week costs you compounding revenue.`
+  },
+  'investor update|write|update': {
+    html: `Here's your draft:<br><br><strong>Subject: Acme Corp — April 2026 Update 🚀</strong><br><br>Hi [Name],<br>• MRR: <span class="g-txt">$12,400</span> — up 23% MoM<br>• Users: 1,247 — up 8% WoW<br>• Shipped: dark mode + CSV export<br><br>This month: Payment flow to unlock 3 enterprise deals (~$4K MRR).<br>Flag: Activation dropped 27% — team on it this week.<br>Ask: Fintech founder intros.<br><br>Live metrics: sparkboard.io/acme/investor`
+  },
+  'best perform|team member|performer': {
+    html: `<strong>🏆 This week's standout: Sara Chen</strong><br>Only team member with ✓ Done status — completed user interviews ahead of schedule.<br><br><strong>Close second: Rahul</strong> — Payment integration at 67% on the most complex task.<br><br><span class="r-txt">⚠️ Concern: Ahmed</span> — Support backlog marked "ongoing" for 3 consecutive weeks. Short 1:1 this week — not a performance review, a support conversation.`
+  },
+  '100k|hundred|forecast|when will': {
+    html: `At your current 23%/mo growth:<div class="ai-mini-metrics"><div class="ai-mini-m"><div class="ai-mini-m-val g">Month +4</div><div class="ai-mini-m-lbl">~$34K MRR</div></div><div class="ai-mini-m"><div class="ai-mini-m-val o">Month +7</div><div class="ai-mini-m-lbl">~$70K MRR</div></div><div class="ai-mini-m"><div class="ai-mini-m-val w">Month +9</div><div class="ai-mini-m-lbl">~$100K MRR</div></div></div><strong>Key risk:</strong> If activation stays broken (41%), growth slows and $100K MRR shifts to month +14. Fix activation this week — it's your biggest lever right now.`
+  },
+  'risk|danger|threat': {
+    html: `<strong>3 risks ranked by urgency:</strong><br><br><span class="r-txt">🔴 Risk 1 — Activation collapse (Urgent)</span><br>Down 27% in 30 days. Compounds weekly. Fix immediately.<br><br><span class="w-txt">🟡 Risk 2 — Revenue concentration (Medium)</span><br>3 enterprise deals = 32% of next growth milestone.<br><br><span class="w-txt">🟡 Risk 3 — Runway compression (Watch)</span><br>9 months fine but fundraise in 4-5 months if growth slows.<br><br><strong>Good news:</strong> All 3 are fixable now.`
+  },
+  'hire|hiring': {
+    html: `<strong>Hire now: Second engineer</strong><br>Rahul is your only dev at ~100% capacity. One hire doubles output and unblocks the roadmap.<br><br><strong>Wait on: Sales hire</strong><br>PLG is working at 23%/mo. Don't add sales overhead until you've optimized that further.<br><br><strong>Financial check:</strong> At $12.4K MRR with 23% growth and $18K burn, you can afford a hire without touching your 9-month runway.`
+  }
+};
+
+function getAIResponse(input) {
+  const l = input.toLowerCase();
+  for (const [pattern, resp] of Object.entries(aiResponses)) {
+    if (pattern.split('|').some(k => l.includes(k))) return resp.html;
+  }
+  return `Great question! I'm running in demo mode using Acme Corp sample data.<br><br>When you join Sparkboard and connect your real company data, I'll give you answers based on YOUR actual metrics, YOUR team, and YOUR specific situation.<br><br>Try one of the quick questions above to see how specific my answers get! 👆`;
+}
+
+function addAIMsg(html, isUser) {
+  const msgs = document.getElementById('aiChatMsgs');
+  if (!msgs) return;
+  const d = document.createElement('div');
+  d.className = 'ai-msg' + (isUser ? ' user' : '');
+  d.style.animation = 'fadeUp 0.3s ease both';
+  if (isUser) {
+    d.innerHTML = `<div class="ai-msg-av u">👤</div><div><div class="ai-bubble">${html}</div><div class="ai-msg-time">You · just now</div></div>`;
+  } else {
+    d.innerHTML = `<div class="ai-msg-av">🤖</div><div><div class="ai-bubble">${html}</div><div class="ai-msg-time">Sparkboard AI · just now</div></div>`;
+  }
+  msgs.appendChild(d);
+  msgs.scrollTop = msgs.scrollHeight;
+}
+
+function showAITyping() {
+  const msgs = document.getElementById('aiChatMsgs');
+  if (!msgs) return;
+  const d = document.createElement('div');
+  d.id = 'aiTyping'; d.className = 'typing-bubble';
+  d.innerHTML = `<div class="ai-msg-av">🤖</div><div class="typing-dots-wrap"><div class="tdot"></div><div class="tdot"></div><div class="tdot"></div></div>`;
+  msgs.appendChild(d); msgs.scrollTop = msgs.scrollHeight;
+}
+
+function hideAITyping() { document.getElementById('aiTyping')?.remove(); }
+
+function setAILoading(v) {
+  const btn = document.getElementById('aiSendBtn');
+  if (btn) btn.disabled = v;
+  document.querySelectorAll('.quick-btn').forEach(b => b.disabled = v);
+}
+
+function sendAIMessage() {
+  const input = document.getElementById('aiChatInput');
+  if (!input) return;
+  const text = input.value.trim();
+  if (!text) return;
+  input.value = '';
+  addAIMsg(text, true);
+  setAILoading(true); showAITyping();
+  const response = getAIResponse(text);
+  setTimeout(() => {
+    hideAITyping();
+    addAIMsg(response, false);
+    setAILoading(false);
+  }, 900 + Math.random()*700);
+}
+
+function sendAIQuick(btn, text) {
+  const input = document.getElementById('aiChatInput');
+  if (input) input.value = text;
+  sendAIMessage();
+}
+
+// ─── SCROLL REVEAL ───
+function initReveal() {
+  const obs = new IntersectionObserver(entries => {
+    entries.forEach(e => { if(e.isIntersecting) e.target.classList.add('in'); });
+  }, {threshold:0.08});
+  document.querySelectorAll('.reveal').forEach(el => {
+    el.classList.remove('in');
+    obs.observe(el);
+  });
+}
+initReveal();
+</script>
+
 </body>
 </html>
