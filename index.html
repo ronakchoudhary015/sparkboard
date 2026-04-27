@@ -1222,17 +1222,107 @@ function joinWaitlist(source) {
   }, 1200);
 }
 
-// ─── AI WAITLIST ───
-function joinAIWaitlist() {
-  const email = document.getElementById('aiWlEmail')?.value?.trim();
-  if (!email || !email.includes('@')) { showToast('Please enter a valid email', 'ai'); return; }
-  const btn = document.querySelector('.ai-wl-btn');
-  if (btn) { btn.textContent='Adding you...'; btn.style.opacity='0.7'; }
-  setTimeout(() => {
-    if (btn) { btn.textContent='✓ You\'re on the list!'; btn.style.background='var(--ai-green)'; btn.style.opacity='1'; }
+// ─── GOOGLE SHEET CONNECTION ───
+const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxuaSsIjgh4apEw5dmSuOHwKfhALDZOXK14ZVmLyKgVZ53WP6DxszxqbCO5-CcYQbfD/exec";
+
+async function saveEmailToGoogleSheet(email, source) {
+  await fetch(GOOGLE_SCRIPT_URL, {
+    method: "POST",
+    mode: "no-cors",
+    body: JSON.stringify({
+      email: email,
+      source: source,
+      page: window.location.href,
+      time: new Date().toISOString()
+    })
+  });
+}
+
+// ─── JOIN WAITLIST ───
+async function joinWaitlist(source) {
+  const emailId = source === "hero" ? "heroEmail" : "mainWlEmail";
+  const email = document.getElementById(emailId)?.value?.trim();
+
+  if (!email || !email.includes("@")) {
+    showToast("Please enter a valid email address", "main");
+    return;
+  }
+
+  const btn = source === "hero"
+    ? document.querySelector(".wf-btn")
+    : document.querySelector(".mwl-btn");
+
+  if (btn) {
+    btn.textContent = "Adding you...";
+    btn.style.opacity = "0.7";
+    btn.disabled = true;
+  }
+
+  try {
+    await saveEmailToGoogleSheet(email, source);
+
+    if (source === "hero") {
+      document.getElementById("heroFormArea").innerHTML = `
+        <div style="background:rgba(26,107,60,0.1);border:1px solid rgba(26,107,60,0.2);border-radius:14px;padding:20px 28px;text-align:center;max-width:520px;">
+          <div style="font-size:1.5rem;margin-bottom:8px;">🎉</div>
+          <div style="font-weight:700;font-size:1rem;margin-bottom:6px;color:var(--ink);">You're on the list!</div>
+          <div style="font-size:0.85rem;color:var(--ink2);">Check your email. 50% off locked in forever.</div>
+        </div>`;
+    } else {
+      document.getElementById("mainWlFormWrap").style.display = "none";
+      document.getElementById("mainWlSuccess").classList.add("show");
+    }
+
     incrementCount();
-    showToast('🎉 You\'re on the waitlist! Check your email.', 'ai');
-  }, 1200);
+    showToast("🎉 You're on the waitlist! Check your email.", "main");
+  } catch (error) {
+    if (btn) {
+      btn.textContent = "Try again →";
+      btn.style.opacity = "1";
+      btn.disabled = false;
+    }
+
+    showToast("Something went wrong. Try again.", "main");
+  }
+}
+
+// ─── AI WAITLIST ───
+async function joinAIWaitlist() {
+  const email = document.getElementById("aiWlEmail")?.value?.trim();
+
+  if (!email || !email.includes("@")) {
+    showToast("Please enter a valid email", "ai");
+    return;
+  }
+
+  const btn = document.querySelector(".ai-wl-btn");
+
+  if (btn) {
+    btn.textContent = "Adding you...";
+    btn.style.opacity = "0.7";
+    btn.disabled = true;
+  }
+
+  try {
+    await saveEmailToGoogleSheet(email, "ai-waitlist");
+
+    if (btn) {
+      btn.textContent = "✓ You're on the list!";
+      btn.style.background = "var(--ai-green)";
+      btn.style.opacity = "1";
+    }
+
+    incrementCount();
+    showToast("🎉 You're on the waitlist! Check your email.", "ai");
+  } catch (error) {
+    if (btn) {
+      btn.textContent = "Join waitlist";
+      btn.style.opacity = "1";
+      btn.disabled = false;
+    }
+
+    showToast("Something went wrong. Try again.", "ai");
+  }
 }
 document.addEventListener('keypress', e => {
   if (e.key === 'Enter') {
