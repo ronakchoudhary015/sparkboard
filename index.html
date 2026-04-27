@@ -691,6 +691,234 @@ nav {
   .ai-sp-chat,.ai-sp-caps { display:none; }
   .ai-spotlight-grid { grid-template-columns:1fr; }
 }
+/* MOBILE FIX — AI CO-FOUNDER PAGE */
+@media (max-width: 600px) {
+  #aiNav {
+    padding: 14px 18px;
+    gap: 10px;
+    overflow: hidden;
+  }
+
+  .logo-ai {
+    font-size: 1.05rem;
+    white-space: nowrap;
+  }
+
+  .nav-ai-badge {
+    display: none;
+  }
+
+  .nav-back-btn {
+    padding: 9px 13px;
+    font-size: 0.75rem;
+    white-space: nowrap;
+  }
+
+  .ai-hero {
+    min-height: auto;
+    padding: 105px 20px 64px;
+  }
+
+  .ai-hero-tag {
+    font-size: 0.62rem;
+    padding: 8px 13px;
+    margin-bottom: 24px;
+    max-width: 100%;
+    text-align: center;
+  }
+
+  .ai-hero h1 {
+    font-size: clamp(2.85rem, 13vw, 4.2rem);
+    line-height: 0.95;
+    letter-spacing: -0.055em;
+    margin-bottom: 22px;
+  }
+
+  .ai-hero-sub {
+    font-size: 1rem;
+    line-height: 1.65;
+    max-width: 335px;
+    margin-bottom: 28px;
+  }
+
+  .ai-hero-ctas {
+    flex-direction: column;
+    width: 100%;
+    max-width: 335px;
+    margin-bottom: 34px;
+  }
+
+  .ai-btn-primary,
+  .ai-btn-ghost {
+    width: 100%;
+    padding: 14px 18px;
+    font-size: 0.9rem;
+  }
+
+  .caps-row {
+    max-width: 335px;
+    gap: 8px;
+  }
+
+  .cap-pill {
+    font-size: 0.72rem;
+    padding: 7px 11px;
+  }
+
+  .ai-section {
+    padding: 70px 20px;
+  }
+
+  .ai-title {
+    font-size: clamp(2.15rem, 10vw, 3.2rem);
+    line-height: 1;
+    margin-bottom: 34px;
+  }
+
+  .vs-grid {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+
+  .vs-divider-wrap {
+    display: none;
+  }
+
+  .vs-card {
+    padding: 24px 20px;
+  }
+
+  .ai-demo-section {
+    padding: 0 14px 70px;
+  }
+
+  .demo-shell {
+    border-radius: 18px;
+  }
+
+  .demo-bar {
+    padding: 12px 14px;
+    gap: 10px;
+  }
+
+  .demo-bar-title {
+    font-size: 0.65rem;
+    text-align: left;
+  }
+
+  .demo-live-badge {
+    display: none;
+  }
+
+  .demo-layout {
+    display: flex;
+    flex-direction: column;
+    height: auto;
+  }
+
+  .demo-sidebar {
+    max-height: none;
+    border-right: none;
+    border-bottom: 1px solid var(--ai-border);
+  }
+
+  .sb-head {
+    padding: 16px;
+  }
+
+  .sb-data,
+  .sb-topics {
+    display: none;
+  }
+
+  .chat-msgs {
+    padding: 16px;
+    max-height: 520px;
+  }
+
+  .ai-bubble {
+    max-width: 86%;
+    font-size: 0.82rem;
+    line-height: 1.55;
+    padding: 12px 14px;
+  }
+
+  .ai-mini-metrics,
+  .ex-metrics-row {
+    grid-template-columns: 1fr;
+  }
+
+  .quick-row {
+    padding: 0 14px 12px;
+    overflow-x: auto;
+    flex-wrap: nowrap;
+  }
+
+  .quick-btn {
+    flex-shrink: 0;
+    font-size: 0.72rem;
+    padding: 7px 12px;
+  }
+
+  .chat-inp-wrap {
+    padding: 12px 14px 16px;
+  }
+
+  .chat-inp-row {
+    border-radius: 16px;
+    padding: 8px 8px 8px 14px;
+  }
+
+  .ai-caps-grid,
+  .ex-panel.show {
+    grid-template-columns: 1fr;
+  }
+
+  .ai-cap-card,
+  .ex-q-card,
+  .ex-a-card {
+    padding: 24px 20px;
+  }
+
+  .ex-tabs {
+    justify-content: flex-start;
+    overflow-x: auto;
+    flex-wrap: nowrap;
+    padding-bottom: 6px;
+  }
+
+  .ex-tab {
+    flex-shrink: 0;
+    padding: 9px 16px;
+    font-size: 0.75rem;
+  }
+
+  .ai-wl-bar {
+    margin: 0 14px 70px;
+    padding: 34px 20px;
+  }
+
+  .ai-wl-title {
+    font-size: 2.15rem;
+    line-height: 1;
+  }
+
+  .ai-wl-form {
+    flex-direction: column;
+  }
+
+  .ai-wl-input,
+  .ai-wl-btn {
+    width: 100%;
+    border-radius: 14px;
+  }
+
+  .ai-footer {
+    flex-direction: column;
+    text-align: center;
+    padding: 28px 20px;
+  }
+}
 </style>
 </head>
 <body>
