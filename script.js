@@ -1,4 +1,30 @@
-document.getElementById("emailForm").addEventListener("submit", function(e) {
+const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/YOUR_LINK_HERE/exec";
+
+document.getElementById("emailForm").addEventListener("submit", async function (e) {
   e.preventDefault();
-  document.getElementById("successMsg").classList.remove("hidden");
+
+  const emailInput = document.getElementById("email");
+  const successMsg = document.getElementById("successMsg");
+  const email = emailInput.value.trim();
+
+  if (!email) return;
+
+  successMsg.classList.remove("hidden");
+  successMsg.textContent = "Joining waitlist...";
+
+  try {
+    await fetch(GOOGLE_SCRIPT_URL, {
+      method: "POST",
+      mode: "no-cors",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ email: email }),
+    });
+
+    emailInput.value = "";
+    successMsg.textContent = "You're on the list 🎉";
+  } catch (error) {
+    successMsg.textContent = "Something went wrong. Try again.";
+  }
 });
