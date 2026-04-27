@@ -710,29 +710,41 @@ nav {
 /* MOBILE FIX — AI CO-FOUNDER PAGE */
 @media (max-width: 600px) {
   #aiNav {
-    padding: 14px 18px;
-    gap: 10px;
+    padding: 12px 14px;
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 8px;
+    align-items: center;
     overflow: hidden;
   }
 
   .logo-ai {
-    font-size: 1.05rem;
+    font-size: 1.35rem;
+    line-height: 1;
     white-space: nowrap;
   }
 
   .nav-ai-badge {
-    display: none;
+    display: none !important;
   }
 
   .nav-back-btn {
-    padding: 9px 13px;
-    font-size: 0.75rem;
-    white-space: nowrap;
+    width: 82px;
+    height: 82px;
+    border-radius: 50%;
+    padding: 0;
+    font-size: 0.72rem;
+    line-height: 1.25;
+    text-align: center;
+    white-space: normal;
+    display: flex;
+    align-items: center;
+    justify-content: center;
   }
 
   .ai-hero {
     min-height: auto;
-    padding: 105px 20px 64px;
+    padding: 130px 20px 64px;
   }
 
   .ai-hero-tag {
@@ -749,7 +761,6 @@ nav {
     letter-spacing: -0.055em;
     margin-bottom: 22px;
   }
-
   .ai-hero-sub {
     font-size: 1rem;
     line-height: 1.65;
